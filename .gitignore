@@ -67,3 +67,4 @@ crashlytics-build.properties
 !*.*.meta
 .vscode
 !.vscode/launch.json
+.vsconfig
