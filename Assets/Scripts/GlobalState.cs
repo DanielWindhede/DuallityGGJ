@@ -2,13 +2,13 @@ using UnityEngine;
 
 public class GlobalState : MonoBehaviour
 {
-    public static GlobalState Instance { get; private set; }
+    public static GlobalState state { get; private set; }
 
     private void Awake() {
-        if (Instance != null && Instance != this)
+        if (state != null && state != this)
             Destroy(this);
         else
-            Instance = this;
+            state = this;
     }
 
     public BlockInputManager blockInputManager;
