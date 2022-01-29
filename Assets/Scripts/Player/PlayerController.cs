@@ -10,7 +10,6 @@ public class PlayerController : MonoBehaviour, PlayerInput
     public PlayerIdleState idleState;
     public PlayerWalkingState walkingState;
     public PlayerJumpingState jumpingState;
-    public PlayerPreJumpState preJumpState;
     public PlayerFallingState fallingState;
     public PlayerDashingState dashingState;
     public PlayerSlidingState slidingState;
@@ -20,6 +19,7 @@ public class PlayerController : MonoBehaviour, PlayerInput
     public float groundCheckRadius;
     public Transform groundCheckPosition;
     public LayerMask groundaLayermask;
+    public float playerWidth;
     public float groundRaycastLength;
 
     [Header("Horizontal Movement")]
@@ -55,6 +55,13 @@ public class PlayerController : MonoBehaviour, PlayerInput
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(groundCheckPosition.position, groundCheckRadius);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawSphere(transform.position - new Vector3(playerWidth, 0f, 0f), 0.1f);
+        Gizmos.DrawSphere(transform.position + new Vector3(playerWidth, 0f, 0f), 0.1f);
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(transform.position - new Vector3(playerWidth, 0f, 0f), Vector3.down * groundRaycastLength);
+        Gizmos.DrawRay(transform.position, Vector3.down * groundRaycastLength);
+        Gizmos.DrawRay(transform.position + new Vector3(playerWidth, 0f, 0f), Vector3.down * groundRaycastLength);
     }
 
     private void Awake()
@@ -64,7 +71,6 @@ public class PlayerController : MonoBehaviour, PlayerInput
         idleState = new PlayerIdleState(this);
         walkingState = new PlayerWalkingState(this);
         jumpingState = new PlayerJumpingState(this);
-        preJumpState = new PlayerPreJumpState(this);
         fallingState = new PlayerFallingState(this);
         dashingState = new PlayerDashingState(this);
         slidingState = new PlayerSlidingState(this);
@@ -135,7 +141,7 @@ public class PlayerIdleState : State<PlayerController>
     {
         if (owner.grounded && owner.inputJump)
         {
-            owner.stateMachine.ChangeState(owner.preJumpState);
+            owner.stateMachine.ChangeState(owner.jumpingState);
         }
         else if (!owner.grounded)
         {
@@ -156,8 +162,63 @@ public class PlayerIdleState : State<PlayerController>
         //slow down
         owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, Vector3.zero, ref owner.zeroVector, owner.groundedMovementSmoothing);
 
-        RaycastHit2D hit = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
-        angleBetweenVectors = Vector3.SignedAngle(Vector3.up, hit.normal, Vector3.forward);
+        RaycastHit2D hit1 = Physics2D.Raycast(owner.transform.position - new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit2 = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit3 = Physics2D.Raycast(owner.transform.position + new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+
+        Vector2 sumOfNormals = Vector2.zero;
+
+
+        if (hit1 != null)
+            sumOfNormals += hit1.normal;
+        if (hit2 != null)
+            sumOfNormals += hit2.normal;
+        if (hit3 != null)
+            sumOfNormals += hit3.normal;
+
+        //Vector2 debugSumOfHitPoint = new Vector2(100000,100000);
+
+        //if (hit1 != null)
+        //{
+        //    sumOfNormals += hit1.normal;
+        //    debugSumOfHitPoint = hit1.point;
+        //}
+        //if (hit2 != null)
+        //{
+        //    sumOfNormals += hit2.normal;
+
+        //    if (Vector2.Distance(debugSumOfHitPoint, new Vector2(100000, 100000)) < 0.1f)
+        //    {
+        //        debugSumOfHitPoint = hit2.point;
+        //    }
+        //    else
+        //    {
+        //        debugSumOfHitPoint += (hit2.point - debugSumOfHitPoint) / 2;
+        //    }
+        //}
+        //if (hit3 != null)
+        //{
+        //    sumOfNormals += hit3.normal;
+
+        //    if (Vector2.Distance(debugSumOfHitPoint, new Vector2(100000, 100000)) < 0.1f)
+        //    {
+        //        debugSumOfHitPoint = hit3.point;
+        //    }
+        //    else
+        //    {
+        //        debugSumOfHitPoint += (hit3.point - debugSumOfHitPoint) / 2;
+        //    }
+        //}
+
+        sumOfNormals.Normalize();
+
+        //Debug.DrawRay(debugSumOfHitPoint, sumOfNormals * 3f);
+
+
+        angleBetweenVectors = Vector3.SignedAngle(Vector3.up, sumOfNormals, Vector3.forward);
+
+        //RaycastHit2D hit = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+        //angleBetweenVectors = Vector3.SignedAngle(Vector3.up, hit.normal, Vector3.forward);
 
     }
 
@@ -189,7 +250,7 @@ public class PlayerWalkingState : State<PlayerController>
         }
         else if (owner.grounded && owner.inputJump)
         {
-            owner.stateMachine.ChangeState(owner.preJumpState);
+            owner.stateMachine.ChangeState(owner.jumpingState);
         }
         else if (!owner.grounded)
         {
@@ -203,40 +264,69 @@ public class PlayerWalkingState : State<PlayerController>
 
     public override void FixedExecute()
     {
-        //walk (no slope)
+        //RaycastHit2D hit = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
 
-        RaycastHit2D hit = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit1 = Physics2D.Raycast(owner.transform.position - new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit2 = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit3 = Physics2D.Raycast(owner.transform.position + new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+
+        Vector2 sumOfNormals = Vector2.zero;
+
+
+        if (hit1 != null)
+            sumOfNormals += hit1.normal;
+        if (hit2 != null)
+            sumOfNormals += hit2.normal;
+        if (hit3 != null)
+            sumOfNormals += hit3.normal;
+
+        sumOfNormals.Normalize();
+
 
 
         Vector3 targetDirection = new Vector3(owner.inputDirection.normalized.x, 0f, 0f);
 
-        if (hit.collider != null)
-        {
-            Debug.DrawRay(hit.point, hit.normal.normalized * 3f);
 
-            angleBetweenVectors = Vector3.SignedAngle(Vector3.up, hit.normal, Vector3.forward);
+        //Debug.DrawRay(hit.point, hit.normal.normalized * 3f);
 
-            targetDirection = Quaternion.AngleAxis(angleBetweenVectors, Vector3.forward) * targetDirection;
+        angleBetweenVectors = Vector3.SignedAngle(Vector3.up, sumOfNormals, Vector3.forward);
 
-            Debug.DrawRay(owner.transform.position, targetDirection * 3f);
+        targetDirection = Quaternion.AngleAxis(angleBetweenVectors, Vector3.forward) * targetDirection;
 
-            Vector3 targetVelocity = targetDirection * Mathf.Abs(owner.inputDirection.x) * owner.horizontalMovementSpeed;
+        //Debug.DrawRay(owner.transform.position, targetDirection * 3f);
 
-            owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, targetVelocity, ref owner.zeroVector, owner.groundedMovementSmoothing);
-        }
-        else
-        {
-            //hämta från ground check och ta normalizerade summan av alla normaler 
+        Vector3 targetVelocity = targetDirection * Mathf.Abs(owner.inputDirection.x) * owner.horizontalMovementSpeed;
 
-            //owner.GetComponent<Collider2D>().GetContacts(Physics2D.OverlapCircleAll(owner.groundCheckPosition.position, owner.groundCheckRadius, owner.groundaLayermask));
-
-            //Collision2D[] currentGroundColliders = Physics2D.OverlapCircleAll(owner.groundCheckPosition.position, owner.groundCheckRadius, owner.groundaLayermask);
+        owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, targetVelocity, ref owner.zeroVector, owner.groundedMovementSmoothing);
 
 
-            Vector3 targetVelocity = targetDirection * Mathf.Abs(owner.inputDirection.x) * owner.horizontalMovementSpeed;
+        //if (hit.collider != null)
+        //{
+        //    //Debug.DrawRay(hit.point, hit.normal.normalized * 3f);
 
-            owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, targetVelocity, ref owner.zeroVector, owner.groundedMovementSmoothing);
-        }
+        //    angleBetweenVectors = Vector3.SignedAngle(Vector3.up, hit.normal, Vector3.forward);
+
+        //    targetDirection = Quaternion.AngleAxis(angleBetweenVectors, Vector3.forward) * targetDirection;
+
+        //    //Debug.DrawRay(owner.transform.position, targetDirection * 3f);
+
+        //    Vector3 targetVelocity = targetDirection * Mathf.Abs(owner.inputDirection.x) * owner.horizontalMovementSpeed;
+
+        //    owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, targetVelocity, ref owner.zeroVector, owner.groundedMovementSmoothing);
+        //}
+        //else
+        //{
+        //    //hämta från ground check och ta normalizerade summan av alla normaler 
+
+        //    //owner.GetComponent<Collider2D>().GetContacts(Physics2D.OverlapCircleAll(owner.groundCheckPosition.position, owner.groundCheckRadius, owner.groundaLayermask));
+
+        //    //Collision2D[] currentGroundColliders = Physics2D.OverlapCircleAll(owner.groundCheckPosition.position, owner.groundCheckRadius, owner.groundaLayermask);
+
+
+        //    Vector3 targetVelocity = targetDirection * Mathf.Abs(owner.inputDirection.x) * owner.horizontalMovementSpeed;
+
+        //    owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, targetVelocity, ref owner.zeroVector, owner.groundedMovementSmoothing);
+        //}
 
     }
 
@@ -259,6 +349,36 @@ public class PlayerJumpingState : State<PlayerController>
     {
         Debug.Log("YIPIEEE");
         jumpTimer = new Timer(owner.maxJumpTime);
+
+        //RaycastHit2D hit = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+
+        RaycastHit2D hit1 = Physics2D.Raycast(owner.transform.position - new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit2 = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit3 = Physics2D.Raycast(owner.transform.position + new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+
+        Vector2 sumOfNormals = Vector2.zero;
+
+
+        if (hit1 != null)
+            sumOfNormals += hit1.normal;
+        if (hit2 != null)
+            sumOfNormals += hit2.normal;
+        if (hit3 != null)
+            sumOfNormals += hit3.normal;
+
+        sumOfNormals.Normalize();
+
+            owner.rigidbody.velocity = sumOfNormals * owner.jumpSpeed;
+
+
+        //if (hit.collider != null)
+        //{
+        //    owner.rigidbody.velocity = hit.normal * owner.jumpSpeed;
+        //}
+        //else
+        //{
+        //    owner.rigidbody.velocity = new Vector3(owner.rigidbody.velocity.x, owner.jumpSpeed, 0f);
+        //}
     }
 
     public override void Execute()
@@ -272,7 +392,6 @@ public class PlayerJumpingState : State<PlayerController>
         {
             owner.stateMachine.ChangeState(owner.fallingState);
         }
-        //TODO: fixa så man går in i falling efter en tid eller om man släpper (maio)
     }
 
     public override void FixedExecute()
@@ -289,47 +408,6 @@ public class PlayerJumpingState : State<PlayerController>
     {
     }
 
-}
-
-public class PlayerPreJumpState : State<PlayerController>
-{
-
-    public PlayerPreJumpState(PlayerController owner)
-    {
-        this.owner = owner;
-    }
-
-    public override void Enter()
-    {
-        Debug.Log("we bout to jump");
-    }
-
-    public override void Execute()
-    {
-
-    }
-
-    public override void FixedExecute()
-    {
-        RaycastHit2D hit = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
-
-        if (hit.collider != null)
-        {
-
-            owner.rigidbody.velocity = hit.normal * owner.jumpSpeed;
-        }
-        else
-        {
-            owner.rigidbody.velocity = new Vector3(owner.rigidbody.velocity.x, owner.jumpSpeed, 0f);
-        }
-
-        owner.stateMachine.ChangeState(owner.jumpingState);
-    }
-
-    public override void Exit()
-    {
-
-    }
 }
 
 public class PlayerFallingState : State<PlayerController>
@@ -416,7 +494,11 @@ public class PlayerSlidingState : State<PlayerController>
     {
         if (owner.grounded && owner.inputJump)
         {
-            owner.stateMachine.ChangeState(owner.preJumpState);
+            owner.stateMachine.ChangeState(owner.jumpingState);
+        }
+        else if (!owner.grounded)
+        {
+            owner.stateMachine.ChangeState(owner.fallingState);
         }
         else if (Mathf.Abs(angleBetweenVectors) < owner.maxSlopeAngle)
         {
@@ -426,18 +508,43 @@ public class PlayerSlidingState : State<PlayerController>
 
     public override void FixedExecute()
     {
-        RaycastHit2D hit = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+        //RaycastHit2D hit = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
 
-        angleBetweenVectors = Vector3.SignedAngle(Vector3.up, hit.normal, Vector3.forward);
-        Vector3 slideDiraction = Quaternion.AngleAxis(90 * Mathf.Sign(angleBetweenVectors), Vector3.forward) * hit.normal;
+        RaycastHit2D hit1 = Physics2D.Raycast(owner.transform.position - new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit2 = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit3 = Physics2D.Raycast(owner.transform.position + new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+
+        Vector2 sumOfNormals = Vector2.zero;
+
+
+        if (hit1 != null)
+            sumOfNormals += hit1.normal;
+        if (hit2 != null)
+            sumOfNormals += hit2.normal;
+        if (hit3 != null)
+            sumOfNormals += hit3.normal;
+
+        sumOfNormals.Normalize();
+
+        angleBetweenVectors = Vector3.SignedAngle(Vector3.up, sumOfNormals, Vector3.forward);
+        Vector3 slideDiraction = Quaternion.AngleAxis(90 * Mathf.Sign(angleBetweenVectors), Vector3.forward) * sumOfNormals;
 
 
         Vector3 targetVelocity = slideDiraction * owner.slideSpeed;//if u want u can add angle fast slider
 
         owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, targetVelocity, ref owner.zeroVector, owner.groundedMovementSmoothing);
 
-        Debug.Log("abs value " + Mathf.Abs(angleBetweenVectors));
+        //Debug.Log("abs value " + Mathf.Abs(angleBetweenVectors));
 
+        //angleBetweenVectors = Vector3.SignedAngle(Vector3.up, hit.normal, Vector3.forward);
+        //Vector3 slideDiraction = Quaternion.AngleAxis(90 * Mathf.Sign(angleBetweenVectors), Vector3.forward) * hit.normal;
+
+
+        //Vector3 targetVelocity = slideDiraction * owner.slideSpeed;//if u want u can add angle fast slider
+
+        //owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, targetVelocity, ref owner.zeroVector, owner.groundedMovementSmoothing);
+
+        //Debug.Log("abs value " + Mathf.Abs(angleBetweenVectors));
 
     }
 
