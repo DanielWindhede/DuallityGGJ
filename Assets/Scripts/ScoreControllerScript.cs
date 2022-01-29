@@ -2,35 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ScoreControllerScript : MonoBehaviour {
 
-    static Text scoreText;
+    [SerializeField] TextMeshPro scoreText;
+    [SerializeField] float scoreMultiplier;
 
-    static int score;
 
     static float mStartPos;
-    public static float startPos { get { return mStartPos; } set { mStartPos = value; } }
+    public float startPos { get { return mStartPos; } set { mStartPos = value; } }
 
-    private void Awake()
-    {
-        scoreText = GetComponent<Text>();
-    }
+    GlobalState gs = new GlobalState();
 
     void Start ()
     {
-        score = 0;
         UpdateScore();
 	}
 
-    public static void addScore(float addedScore)
+    private void Update()
     {
-        score = (int)((addedScore - startPos) * 10);
+        gs.score = (int)((transform.position.y - startPos) * scoreMultiplier);
         UpdateScore();
     }
 
-    static void UpdateScore()
+    void UpdateScore()
     {
-        scoreText.text = "Score: " + score;
+        scoreText.text = "Score: " + gs.score;
     }
 }
