@@ -12,16 +12,23 @@ public class PlayerController : MonoBehaviour, PlayerInput
     public PlayerJumpingState jumpingState;
     public PlayerFallingState fallingState;
     public PlayerDashingState dashingState;
+    public PlayerSlidingState slidingState;
     #endregion
 
     [Header ("Ground Check")]
     [SerializeField] float groundCheckRadius;
     [SerializeField] Transform groundCheckPosition;
-    [SerializeField] LayerMask groundaLayermask;
+    public LayerMask groundaLayermask;
 
-    [Header("Movement")]
+    [Header("Horizontal Movement")]
     public float horizontalMovementSpeed;
-    [Range(0, .3f)] public float movementSmoothing = .05f;
+    [Range(0, .3f)] public float groundedMovementSmoothing = .05f;
+    [Range(0, .3f)] public float aerialMovementSmoothing = .05f;
+
+    [Header("Jumping Variables")]
+    public float maxJumpTime;
+    public float jumpSpeed;
+    public float fallForce;
 
 
     [HideInInspector] public bool grounded;
@@ -55,6 +62,7 @@ public class PlayerController : MonoBehaviour, PlayerInput
         jumpingState = new PlayerJumpingState(this);
         fallingState = new PlayerFallingState(this);
         dashingState = new PlayerDashingState(this);
+        slidingState = new PlayerSlidingState(this);
 
         stateMachine.ChangeState(idleState);
 
@@ -78,6 +86,13 @@ public class PlayerController : MonoBehaviour, PlayerInput
         stateMachine.FixedUpdate();
     }
 
+    public void AerialStrafing()
+    {
+        Vector3 targetVelocity = new Vector3(inputDirection.x * horizontalMovementSpeed, rigidbody.velocity.y, 0f);
+        rigidbody.velocity = Vector3.SmoothDamp(rigidbody.velocity, targetVelocity, ref zeroVector, aerialMovementSmoothing);
+    }
+
+    #region Input Callbacks
     public void onMoveCallback(Vector2 value)
     {
         inputDirection = value;
@@ -89,6 +104,8 @@ public class PlayerController : MonoBehaviour, PlayerInput
         inputJump = value;
         Debug.Log("JUMP!!! " + inputJump);
     }
+    #endregion
+
 }
 
 public class PlayerIdleState : State<PlayerController>
@@ -123,7 +140,7 @@ public class PlayerIdleState : State<PlayerController>
     public override void FixedExecute()
     {
         //slow down
-        owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, Vector3.zero, ref owner.zeroVector, owner.movementSmoothing);
+        owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, Vector3.zero, ref owner.zeroVector, owner.groundedMovementSmoothing);
     
     }
 
@@ -165,10 +182,46 @@ public class PlayerWalkingState : State<PlayerController>
     public override void FixedExecute()
     {
         //walk (no slope)
-        Vector3 targetVelocity = new Vector3(owner.inputDirection.x * owner.horizontalMovementSpeed, 0f, 0f);
-        owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, targetVelocity, ref owner.zeroVector, owner.movementSmoothing);
 
-        //TODO: add slope :)
+        RaycastHit hit;
+        Physics.Raycast(owner.transform.position, -owner.transform.up, out hit, 4f, owner.groundaLayermask);
+
+        Vector3 targetDirection = new Vector3(owner.inputDirection.normalized.x, 0f, 0f);
+
+        if (hit.collider != null)
+        {
+            Debug.DrawRay(hit.point, hit.normal.normalized * 3f);
+
+            float angleBetweenVectors = Vector3.SignedAngle(Vector3.up, hit.normal, Vector3.forward);
+            Debug.Log("angle " + angleBetweenVectors);
+
+            if (Mathf.Abs(angleBetweenVectors) < 50)
+            {
+                targetDirection = Quaternion.AngleAxis(angleBetweenVectors, Vector3.forward) * targetDirection;
+
+                Debug.DrawRay(owner.transform.position, targetDirection * 3f);
+
+                Vector3 targetVelocity = targetDirection * Mathf.Abs(owner.inputDirection.x) * owner.horizontalMovementSpeed;
+
+                owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, targetVelocity, ref owner.zeroVector, owner.groundedMovementSmoothing);
+            }
+            else
+            {
+                //SIE!½!!
+
+                //bryt ut till ett eget state 
+                //targetDirection = Quaternion.AngleAxis(90 * Mathf.Sign(angleBetweenVectors), Vector3.forward) * hit.normal;
+                owner.stateMachine.ChangeState(owner.slidingState);
+                
+
+            }
+        }
+        else
+        {
+            Vector3 targetVelocity = targetDirection * Mathf.Abs(owner.inputDirection.x) * owner.horizontalMovementSpeed;
+
+            owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, targetVelocity, ref owner.zeroVector, owner.groundedMovementSmoothing);
+        }
 
     }
 
@@ -180,7 +233,7 @@ public class PlayerWalkingState : State<PlayerController>
 
 public class PlayerJumpingState : State<PlayerController>
 {
-    float jumpTimeCounter;
+    Timer jumpTimer;
 
     public PlayerJumpingState(PlayerController owner)
     {
@@ -190,26 +243,33 @@ public class PlayerJumpingState : State<PlayerController>
     public override void Enter()
     {
         Debug.Log("YIPIEEE");
+        jumpTimer = new Timer(owner.maxJumpTime);
     }
 
     public override void Execute()
     {
-        if (owner.grounded)
+        jumpTimer += Time.deltaTime;
+        if (jumpTimer.Done || !owner.inputJump)
         {
-            owner.stateMachine.ChangeState(owner.idleState);
+            owner.stateMachine.ChangeState(owner.fallingState);
+        }
+        else if (owner.rigidbody.velocity.y < 0.01f)
+        {
+            owner.stateMachine.ChangeState(owner.fallingState);
         }
         //TODO: fixa så man går in i falling efter en tid eller om man släpper (maio)
     }
 
     public override void FixedExecute()
     {
-        //jump
         //air strafe
+        owner.AerialStrafing();
+        //jump
+        owner.rigidbody.velocity = new Vector3(owner.rigidbody.velocity.x, owner.jumpSpeed, 0f);
     }
 
     public override void Exit()
     {
-
     }
 
 }
@@ -237,8 +297,11 @@ public class PlayerFallingState : State<PlayerController>
 
     public override void FixedExecute()
     {
-        //fall
         //air strafe
+        owner.AerialStrafing();
+        //fall
+        owner.rigidbody.velocity -= new Vector3(0f, owner.fallForce, 0f);
+
     }
 
     public override void Exit()
@@ -278,6 +341,48 @@ public class PlayerDashingState : State<PlayerController>
 }
 
 
+public class PlayerSlidingState : State<PlayerController>
+{
+
+    public PlayerSlidingState(PlayerController owner)
+    {
+        this.owner = owner;
+    }
+
+    public override void Enter()
+    {
+        Debug.Log("slide");
+    }
+
+    public override void Execute()
+    {
+
+    }
+
+    public override void FixedExecute()
+    {
+
+        RaycastHit hit;
+        Physics.Raycast(owner.transform.position, -owner.transform.up, out hit, 4f, owner.groundaLayermask);
+        float angleBetweenVectors = Vector3.SignedAngle(Vector3.up, hit.normal, Vector3.forward);
+        Vector3 slideDiraction = Quaternion.AngleAxis(90 * Mathf.Sign(angleBetweenVectors), Vector3.forward) * hit.normal;
+
+
+        Vector3 targetVelocity = slideDiraction * Mathf.Abs(angleBetweenVectors - 50);//multiplyer
+
+        owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, targetVelocity, ref owner.zeroVector, owner.groundedMovementSmoothing);
+
+        if (Mathf.Abs(angleBetweenVectors) > 50)
+        {
+            owner.stateMachine.ChangeState(owner.idleState);
+        }
+    }
+
+    public override void Exit()
+    {
+
+    }
+}
 
 
 public class PlayerCopyState : State<PlayerController>
