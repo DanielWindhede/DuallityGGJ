@@ -19,9 +19,11 @@ public class PlayerController : MonoBehaviour, PlayerInput
     public Animator animator;
 
     [Header("Ground Check")]
-    public float groundCheckRadius;
+    public float groundCheckWidth;
+    public float groundCheckHeight;
     public Transform groundCheckPosition;
     public LayerMask groundaLayermask;
+
     public float playerWidth;
     public float groundRaycastLength;
 
@@ -66,7 +68,7 @@ public class PlayerController : MonoBehaviour, PlayerInput
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(groundCheckPosition.position, groundCheckRadius);
+        Gizmos.DrawWireCube(groundCheckPosition.position, new Vector3(groundCheckWidth, groundCheckHeight, 0.1f));
         Gizmos.color = Color.cyan;
         Gizmos.DrawSphere(transform.position - new Vector3(playerWidth, 0f, 0f), 0.1f);
         Gizmos.DrawSphere(transform.position + new Vector3(playerWidth, 0f, 0f), 0.1f);
@@ -101,7 +103,8 @@ public class PlayerController : MonoBehaviour, PlayerInput
     void Update()
     {
         stateMachine.CurrentlyRunningState.Execute();
-        grounded = Physics2D.OverlapCircle(groundCheckPosition.position, groundCheckRadius, groundaLayermask);
+
+        grounded = Physics2D.OverlapBox(groundCheckPosition.position, new Vector2(groundCheckWidth, groundCheckHeight), 0f, groundaLayermask);
         animator.SetBool("InAir", !grounded);
     }
 
