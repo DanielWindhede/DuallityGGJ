@@ -4,6 +4,7 @@ public interface BlockInput
 {
   void onDirectionCallback(Vector2 value);
   void onAcceptCallback();
+  void onCycleCallback(float value);
   void onRotateAnalogCallback(float value);
   void onRotateAnalogReleaseCallback();
   void onRotateDigitalLeftCallback();
@@ -39,6 +40,9 @@ public class InputHandler<T>
 
                 this.inputActions.Block.Accept.Enable();
                 this.inputActions.Block.Accept.performed += _ => i.onAcceptCallback();
+
+                this.inputActions.Block.Cycle.Enable();
+                this.inputActions.Block.Cycle.performed += context => i.onCycleCallback(context.ReadValue<float>());
 
                 this.inputActions.Block.RotateAnalog.Enable();
                 this.inputActions.Block.RotateAnalog.performed += context => i.onRotateAnalogCallback(context.ReadValue<float>());

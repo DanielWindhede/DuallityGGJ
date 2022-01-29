@@ -71,6 +71,15 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Cycle"",
+                    ""type"": ""Value"",
+                    ""id"": ""ee5bb6a6-4ac2-47d8-8166-8f2f09a17055"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -194,6 +203,39 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""action"": ""RotateDigitalRight"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""5b05fe8d-1f8c-4164-abba-6e0f3fd46a58"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Cycle"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""e9321ddf-e4c8-4915-bc2e-cc8076ca73af"",
+                    ""path"": ""<XInputController>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Cycle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""3a7f5d6d-33b3-41ba-9f29-e874f57e7dac"",
+                    ""path"": ""<XInputController>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Cycle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -409,6 +451,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         m_Block_RotateDigitalLeft = m_Block.FindAction("RotateDigitalLeft", throwIfNotFound: true);
         m_Block_RotateDigitalRight = m_Block.FindAction("RotateDigitalRight", throwIfNotFound: true);
         m_Block_Direction = m_Block.FindAction("Direction", throwIfNotFound: true);
+        m_Block_Cycle = m_Block.FindAction("Cycle", throwIfNotFound: true);
         // Player
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
@@ -483,6 +526,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     private readonly InputAction m_Block_RotateDigitalLeft;
     private readonly InputAction m_Block_RotateDigitalRight;
     private readonly InputAction m_Block_Direction;
+    private readonly InputAction m_Block_Cycle;
     public struct BlockActions
     {
         private @InputActions m_Wrapper;
@@ -492,6 +536,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         public InputAction @RotateDigitalLeft => m_Wrapper.m_Block_RotateDigitalLeft;
         public InputAction @RotateDigitalRight => m_Wrapper.m_Block_RotateDigitalRight;
         public InputAction @Direction => m_Wrapper.m_Block_Direction;
+        public InputAction @Cycle => m_Wrapper.m_Block_Cycle;
         public InputActionMap Get() { return m_Wrapper.m_Block; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -516,6 +561,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @Direction.started -= m_Wrapper.m_BlockActionsCallbackInterface.OnDirection;
                 @Direction.performed -= m_Wrapper.m_BlockActionsCallbackInterface.OnDirection;
                 @Direction.canceled -= m_Wrapper.m_BlockActionsCallbackInterface.OnDirection;
+                @Cycle.started -= m_Wrapper.m_BlockActionsCallbackInterface.OnCycle;
+                @Cycle.performed -= m_Wrapper.m_BlockActionsCallbackInterface.OnCycle;
+                @Cycle.canceled -= m_Wrapper.m_BlockActionsCallbackInterface.OnCycle;
             }
             m_Wrapper.m_BlockActionsCallbackInterface = instance;
             if (instance != null)
@@ -535,6 +583,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @Direction.started += instance.OnDirection;
                 @Direction.performed += instance.OnDirection;
                 @Direction.canceled += instance.OnDirection;
+                @Cycle.started += instance.OnCycle;
+                @Cycle.performed += instance.OnCycle;
+                @Cycle.canceled += instance.OnCycle;
             }
         }
     }
@@ -644,6 +695,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         void OnRotateDigitalLeft(InputAction.CallbackContext context);
         void OnRotateDigitalRight(InputAction.CallbackContext context);
         void OnDirection(InputAction.CallbackContext context);
+        void OnCycle(InputAction.CallbackContext context);
     }
     public interface IPlayerActions
     {

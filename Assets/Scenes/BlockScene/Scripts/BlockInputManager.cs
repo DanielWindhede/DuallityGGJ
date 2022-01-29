@@ -10,6 +10,7 @@ public class BlockInputManager : MonoBehaviour, BlockInput
     public event ButtonClick onRotateLeftClick;
     public event ButtonClick onRotateRightClick;
     public event FloatFunc onRotationAnalog;
+    public event FloatFunc onCycle;
     public event ButtonClick onRotateRelease;
 
     private float horzontalValue = 0;
@@ -69,5 +70,9 @@ public class BlockInputManager : MonoBehaviour, BlockInput
     public void onRotateAnalogReleaseCallback()
     {
         this.onRotateRelease.Invoke();
+    }
+
+    public void onCycleCallback(float value) {
+        this.onCycle.Invoke(value);
     }
 }
