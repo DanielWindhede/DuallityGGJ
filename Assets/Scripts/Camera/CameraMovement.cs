@@ -38,7 +38,7 @@ public class CameraMovement : MonoBehaviour
         }
         else
         {
-            transform.Translate(new Vector3(0f, cameraBaseMovementSpeed * (transform.position.y - startPosition) * cameraMovementSpeedMultiplyer * Time.deltaTime, 0f));
+            transform.Translate(new Vector3(0f, (cameraBaseMovementSpeed + (transform.position.y - startPosition) * cameraMovementSpeedMultiplyer) * Time.deltaTime, 0f));
             //currentSpeed = cameraBaseMovementSpeed * (transform.position.y - startPosition) * cameraMovementSpeedMultiplyer * Time.deltaTime;
             //Debug.Log(currentSpeed);
         }
