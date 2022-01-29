@@ -9,66 +9,47 @@ public class PlatformSpawnerScript : MonoBehaviour
     float spawnRate;
     [SerializeField] float increesPerPlatform;
 
-    Vector2 spawnPos;
+    [SerializeField] float gameScreenWidth;
+    [SerializeField] float gameScreenHeight;
+    
     float nextSpawnHeight;
-    float mCurrentYPos;
-    public float currentYPos { set { mCurrentYPos = value; } }
-    float mStartPosisionY;
-    public float startPosisionY { set { mStartPosisionY = value; } }
+    float currentYPosition;
+    float startPosision;
 
-    float totalSpawnChance;
-
-    [SerializeField] GameObject[] platformArray = new GameObject[2];
+    [SerializeField] GameObject platform;
 
     float[] platformSpawnChanceArray;
 
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawSphere(transform.position - new Vector3(gameScreenWidth, 0f, 0f), 0.1f);
+        Gizmos.DrawSphere(transform.position + new Vector3(gameScreenWidth, 0f, 0f), 0.1f);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawSphere(transform.position + new Vector3(0f, gameScreenHeight, 0f), 0.1f);
+    }
+
     private void Awake()
     {
-        platformSpawnChanceArray = new float[platformArray.Length + 1];
-        platformSpawnChanceArray[0] = 0;
-
-        currentYPos = mStartPosisionY;
+        currentYPosition = startPosision;
         spawnRate = baseSpawnRate;
-
-        for (int i = 0; i < platformArray.Length; i++)
-        {
-            //totalSpawnChance += platformArray[i].GetComponent<BasePlatformScript>().spawnChance;
-            platformSpawnChanceArray[i + 1] = totalSpawnChance;
-        }
     }
 
     private void Start()
     {
-        nextSpawnHeight = mCurrentYPos + spawnRate;
+        nextSpawnHeight = currentYPosition + spawnRate;
     }
 
     void Update()
     {
-        if (mCurrentYPos > nextSpawnHeight)
+        if (transform.parent.position.y > nextSpawnHeight)
         {
-            spawnPos = new Vector2(Random.Range(-2.5f, 2.5f), nextSpawnHeight + 5.5f);
-            if (platformArray.Length > 0)
-            {
-                Instantiate(PickPlatform(), spawnPos, Quaternion.identity);
-            }
+            Vector2 spawnPos = new Vector2(Random.Range(-gameScreenWidth, gameScreenWidth), nextSpawnHeight + gameScreenHeight);
+
+            Instantiate(platform, spawnPos, Quaternion.identity);
+
             spawnRate += increesPerPlatform;
             nextSpawnHeight += spawnRate;
         }
-    }
-
-    GameObject PickPlatform()
-    {
-        float rnd = Random.Range(0, totalSpawnChance);
-        Assert.IsTrue(platformArray.Length > 0);
-
-        for (int i = 0; i < platformArray.Length; i++)
-        {
-            if (platformSpawnChanceArray[i] < rnd && rnd < platformSpawnChanceArray[i + 1])
-            {
-                return platformArray[i];
-            }
-        }
-        Debug.LogWarning("wops");
-        return platformArray[0];
     }
 }
