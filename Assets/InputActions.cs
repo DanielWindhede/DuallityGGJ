@@ -248,7 +248,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""type"": ""Value"",
                     ""id"": ""839a7d43-bb04-4e55-a839-e24a402d87b9"",
                     ""expectedControlType"": ""Vector2"",
-                    ""processors"": """",
+                    ""processors"": ""StickDeadzone"",
                     ""interactions"": """",
                     ""initialStateCheck"": true
                 },

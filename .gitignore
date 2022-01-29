@@ -68,3 +68,4 @@ crashlytics-build.properties
 .vscode
 !.vscode/launch.json
 .vsconfig
+UserSettings/EditorUserSettings.asset
