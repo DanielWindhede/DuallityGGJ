@@ -49,6 +49,14 @@ public class BlockContainer {
         this.currentIndex = GetCycledIndex(directon);
     }
 
+    public void CycleRight() {
+        this.CycleToDirection(ContainerDirection.Right);
+    }
+
+    public void CycleLeft() {
+        this.CycleToDirection(ContainerDirection.Left);
+    }
+
     private int GetCycledIndex(ContainerDirection directon) {
         int dir = 0;
         switch (directon) {
@@ -59,7 +67,6 @@ public class BlockContainer {
                 dir = 1;
                 break;
         }
-        Debug.Log(dir);
 
         int value = this.currentIndex + dir;
         if (value > this.heldBlocks.Count - 1)
@@ -68,89 +75,79 @@ public class BlockContainer {
             return 0;
         return value;
     }
-
-    public void CycleRight() {
-        this.CycleToDirection(ContainerDirection.Right);
-    }
-
-    public void CycleLeft() {
-        this.CycleToDirection(ContainerDirection.Left);
-    }
 }
 
 public class BlockManager : MonoBehaviour
 {
-    private bool enabledControls = true;
-    [SerializeField] private bool loadPlaceholderResources = true;
-    [SerializeField] private Camera camera;
-    private BlockInputManager inputManager;
+    [SerializeField] private bool _loadPlaceholderResources = true;
+    [SerializeField] private Camera _camera;
+    [SerializeField] private float _selectedScaleMultiplier = 1.25f;
+    [SerializeField] private BlockContainer _blockContainer;
+    [SerializeField] private List<GameObject> _blockObjects;
+    [SerializeField] private Transform _uiBlockContainerObject;
+    [SerializeField] private int _maxItemCount = 3;
 
-    [SerializeField] private float selectedScaleMultiplier = 1.25f;
+    private bool _enabledControls = true;
+    private BlockInputManager _inputManager;
 
-    [SerializeField] private BlockContainer blockContainer;
-    [SerializeField] private List<GameObject> blockObjects;
-    [SerializeField] private Transform uiBlockContainerObject;
-
-    int maxItemCount = 3;
-
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        this.inputManager = GlobalState.state.blockInputManager;
+        this._inputManager = GlobalState.state.blockInputManager;
         this.EnableControls();
         this.LoadResources();
-        this.camera = Camera.main;
+        this._camera = Camera.main;
 
-        this.blockContainer = new BlockContainer(maxItemCount);
-        for (int i = 0; i < maxItemCount; i++) {
-            var block = this.blockObjects[i].GetComponent<Block>();
-            this.blockContainer.Add(block);
+        this._blockContainer = new BlockContainer(_maxItemCount);
+        for (int i = 0; i < _maxItemCount; i++) {
+            var block = this._blockObjects[i].GetComponent<Block>();
+            this._blockContainer.Add(block);
             GameObject imageGO = new GameObject();
-            imageGO.AddComponent<Image>().sprite = this.blockObjects[i].GetComponent<Block>().Icon;
+            imageGO.AddComponent<Image>().sprite = this._blockObjects[i].GetComponent<Block>().Icon;
 
-            var go = Instantiate(imageGO, this.uiBlockContainerObject);
+            var go = Instantiate(imageGO, this._uiBlockContainerObject);
             block.iconGameObject = go;
         }
         this.CycleDirection(ContainerDirection.Right);
     } 
 
+    public void EnableControls() {
+        this._inputManager.onAcceptClick += AcceptClick;
+        this._inputManager.onCycle += Cycle;
+        this._enabledControls = true;
+    }
+
+    public void RemoveFromCollection(Block block) {
+        if (this._enabledControls) {
+            this.EnableControls();
+        }
+        this._blockObjects.Remove(block.gameObject);
+    }
+
     private void LoadResources() {
-        string path = "Blocks\\" + (this.loadPlaceholderResources ? "Placeholders" : "") + "\\";
-        this.blockObjects = new List<GameObject>();
+        string path = "Blocks\\" + (this._loadPlaceholderResources ? "Placeholders" : "") + "\\";
+        this._blockObjects = new List<GameObject>();
 
         var resources = Resources.LoadAll<GameObject>(path);
         print(resources);
         foreach (GameObject block in resources) {
-            this.blockObjects.Add(block);
+            this._blockObjects.Add(block);
         }
     }
 
-    public void EnableControls() {
-        this.inputManager.onAcceptClick += AcceptClick;
-        this.inputManager.onCycle += Cycle;
-        this.enabledControls = true;
-    }
-
-    public void RemoveFromCollection(Block block) {
-        if (this.enabledControls) {
-            this.EnableControls();
-        }
-        this.blockObjects.Remove(block.gameObject);
-    }
 
     private void DisableControls() {
-        this.inputManager.onAcceptClick -= AcceptClick;
-        this.enabledControls = false;
+        this._inputManager.onAcceptClick -= AcceptClick;
+        this._enabledControls = false;
     }
 
     private void AcceptClick() {
-        if (this.enabledControls) {
-            var block = this.blockContainer.Pop(ContainerDirection.Current);
+        if (this._enabledControls) {
+            var block = this._blockContainer.Pop(ContainerDirection.Current);
             if (block)  {
                 if (block.iconGameObject)
                     Destroy(block.iconGameObject);
                 
-                var obj = Instantiate(block, this.inputManager.inputPosition, Quaternion.identity, this.transform);
+                var obj = Instantiate(block, this._inputManager.inputPosition, Quaternion.identity, this.transform);
                 obj.name = "Block " + (transform.childCount - 1);
                 this.CycleDirection(ContainerDirection.Current);
                 this.DisableControls();
@@ -163,14 +160,14 @@ public class BlockManager : MonoBehaviour
     }
 
     private void CycleDirection(ContainerDirection value) {
-        this.blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one;
-        this.blockContainer.CycleToDirection(value);
-        this.blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one * selectedScaleMultiplier;
+        this._blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one;
+        this._blockContainer.CycleToDirection(value);
+        this._blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one * _selectedScaleMultiplier;
     }
 
     private void OnDrawGizmos() {
-        if (this.enabledControls && Application.isPlaying) {
-            Gizmos.DrawSphere(this.inputManager.inputPosition, 0.5f);
+        if (this._enabledControls && Application.isPlaying) {
+            Gizmos.DrawSphere(this._inputManager.inputPosition, 0.5f);
         }
     }
 }
