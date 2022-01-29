@@ -37,6 +37,13 @@ public class BlockManager : MonoBehaviour
         this.enabledControls = true;
     }
 
+    public void RemoveFromCollection(Block block) {
+        if (this.enabledControls) {
+            this.EnableControls();
+        }
+        this.blockObjects.Remove(block.gameObject);
+    }
+
     private void DisableControls() {
         this.inputManager.onAcceptClick -= AcceptClick;
         this.enabledControls = false;
@@ -44,9 +51,8 @@ public class BlockManager : MonoBehaviour
 
     private void AcceptClick() {
         if (this.enabledControls) {
-            print("acceptingg");
-            var go = Instantiate(this.blockObjects[0], this.inputManager.inputPosition, Quaternion.identity, this.transform);
-            go.name = "Block " + (transform.childCount - 1);
+            var obj = Instantiate(this.blockObjects[0], this.inputManager.inputPosition, Quaternion.identity, this.transform);
+            obj.name = "Block " + (transform.childCount - 1);
             this.DisableControls();
         }
     }

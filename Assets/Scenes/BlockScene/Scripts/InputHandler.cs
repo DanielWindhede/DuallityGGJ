@@ -2,6 +2,10 @@ public interface BlockInput
 {
   void onHorizontalCallback(float value);
   void onAcceptCallback();
+  void onRotateAnalogCallback(float value);
+  void onRotateAnalogReleaseCallback();
+  void onRotateDigitalLeftCallback();
+  void onRotateDigitalRightCallback();
 }
 
 public class InputHandler<T>
@@ -19,6 +23,15 @@ public class InputHandler<T>
 
             this.inputActions.Block.Accept.Enable();
             this.inputActions.Block.Accept.performed += _ => i.onAcceptCallback();
+
+            this.inputActions.Block.RotateAnalog.Enable();
+            this.inputActions.Block.RotateAnalog.performed += context => i.onRotateAnalogCallback(context.ReadValue<float>());
+            this.inputActions.Block.RotateAnalog.canceled += _ => i.onRotateAnalogReleaseCallback();
+
+            this.inputActions.Block.RotateDigitalLeft.Enable();
+            this.inputActions.Block.RotateDigitalLeft.performed += _ => i.onRotateDigitalLeftCallback();
+            this.inputActions.Block.RotateDigitalRight.Enable();
+            this.inputActions.Block.RotateDigitalRight.performed += _ => i.onRotateDigitalRightCallback();
             break;
     }
   }
