@@ -4,14 +4,15 @@ using UnityEngine;
 
 public class BlockInputManager : MonoBehaviour, BlockInput
 {
-    public delegate void EventType();
-    public event EventType SampleEvent;
+    public delegate void AcceptClick();
+    public event AcceptClick onAcceptClick;
 
     private float horzontalValue = 0;
     [SerializeField] private Camera camera;
     [SerializeField, Min(0)] private float width = 10f;
     private InputHandler<BlockInput> inputHandler;
-    Vector2 inputPosition {
+
+    public Vector2 inputPosition {
         get {
             var offset = Vector2.up * 3;
             var pos = this.camera.transform.position;
@@ -36,19 +37,19 @@ public class BlockInputManager : MonoBehaviour, BlockInput
         this.horzontalValue = value;
     }
     public void onAcceptCallback() {
-        print("pressed!");
+        this.onAcceptClick.Invoke();
         // Instantiate(this.blockObjects[0], inputPosition, Quaternion.identity);
     }
     private void OnDrawGizmos() {
-        var offset = Vector2.up * 3;
-        var pos = this.camera.transform.position;
-        Vector2 centerPosition = new Vector2(pos.x, pos.y);
-        Vector2 initialPosition = centerPosition + Vector2.left * this.width / 2;
-        Vector2 finalPosition = centerPosition + Vector2.right * this.width / 2;
+        // var offset = Vector2.up * 3;
+        // var pos = this.camera.transform.position;
+        // Vector2 centerPosition = new Vector2(pos.x, pos.y);
+        // Vector2 initialPosition = centerPosition + Vector2.left * this.width / 2;
+        // Vector2 finalPosition = centerPosition + Vector2.right * this.width / 2;
 
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(initialPosition + offset, finalPosition + offset);
+        // Gizmos.color = Color.red;
+        // Gizmos.DrawLine(initialPosition + offset, finalPosition + offset);
 
-        Gizmos.DrawSphere(this.inputPosition, 0.5f);
+        // Gizmos.DrawSphere(this.inputPosition, 0.5f);
     }
 }
