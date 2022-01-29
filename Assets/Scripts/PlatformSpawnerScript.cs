@@ -16,7 +16,7 @@ public class PlatformSpawnerScript : MonoBehaviour
     float currentYPosition;
     float startPosision;
 
-    [SerializeField] GameObject platform;
+    [SerializeField] GameObject[] platforms;
 
     float[] platformSpawnChanceArray;
 
@@ -46,10 +46,15 @@ public class PlatformSpawnerScript : MonoBehaviour
         {
             Vector2 spawnPos = new Vector2(Random.Range(-gameScreenWidth, gameScreenWidth), nextSpawnHeight + gameScreenHeight);
 
-            Instantiate(platform, spawnPos, Quaternion.identity);
+            Instantiate(PickPlatform(), spawnPos, Quaternion.identity);
 
             spawnRate += increesPerPlatform;
             nextSpawnHeight += spawnRate;
         }
+    }
+
+    private GameObject PickPlatform()
+    {
+        return platforms[Random.Range(0, platforms.Length)];
     }
 }

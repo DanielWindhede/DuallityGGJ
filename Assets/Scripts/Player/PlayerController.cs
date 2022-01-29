@@ -34,8 +34,14 @@ public class PlayerController : MonoBehaviour, PlayerInput
     public float jumpSpeed;
     public float fallForce;
 
+    [Header("Dashing Variables")]
+    public float dashTime;
+    public float dashSpeedIncrease;
+    public float dashMinSpeed;
+
 
     [HideInInspector] public bool grounded;
+    [HideInInspector] public bool canDash = true;
     [HideInInspector] public Vector3 zeroVector = Vector3.zero;
     [HideInInspector] public Rigidbody2D rigidbody;
 
@@ -115,9 +121,12 @@ public class PlayerController : MonoBehaviour, PlayerInput
         inputJump = value;
     }
 
-    public void onDashCallback(bool value)
+    public void onDashCallback()
     {
-
+        if (canDash)
+        {
+            stateMachine.ChangeState(dashingState);
+        }
     }
     #endregion
 
@@ -322,7 +331,8 @@ public class PlayerJumpingState : State<PlayerController>
 
         sumOfNormals.Normalize();
 
-        owner.rigidbody.velocity = sumOfNormals * owner.jumpSpeed;
+        owner.rigidbody.velocity = new Vector2(owner.rigidbody.velocity.x, 0f) + sumOfNormals * owner.jumpSpeed;
+        //owner.rigidbody.velocity = sumOfNormals * owner.jumpSpeed;
 
     }
 
@@ -384,13 +394,16 @@ public class PlayerFallingState : State<PlayerController>
 
     public override void Exit()
     {
-
+        owner.canDash = true;
     }
 
 }
 
 public class PlayerDashingState : State<PlayerController>
 {
+    Timer dashTimer;
+    Vector2 dashDirection;
+    float dashSpeed;
 
     public PlayerDashingState(PlayerController owner)
     {
@@ -399,17 +412,26 @@ public class PlayerDashingState : State<PlayerController>
 
     public override void Enter()
     {
+        dashTimer = new Timer(owner.dashTime);
+        owner.canDash = false;
+        dashDirection = (owner.inputDirection.magnitude > 0.03f) ? owner.inputDirection.normalized : Vector2.up;
+        dashSpeed = (owner.rigidbody.velocity.magnitude + owner.dashSpeedIncrease > owner.dashMinSpeed) ? (owner.rigidbody.velocity.magnitude + owner.dashSpeedIncrease) : owner.dashMinSpeed;
+
         Debug.Log("Dashing");
     }
 
     public override void Execute()
     {
-
+        dashTimer += Time.deltaTime;
+        if (dashTimer.Done)
+        {
+            owner.stateMachine.ChangeState(owner.fallingState);
+        }
     }
 
     public override void FixedExecute()
     {
-
+        owner.rigidbody.velocity = dashDirection * dashSpeed;
     }
 
     public override void Exit()
