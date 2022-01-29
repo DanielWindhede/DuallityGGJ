@@ -15,6 +15,9 @@ public class PlayerController : MonoBehaviour, PlayerInput
     public PlayerSlidingState slidingState;
     #endregion
 
+    [Header("Animation")]
+    public Animator animator;
+
     [Header("Ground Check")]
     public float groundCheckRadius;
     public Transform groundCheckPosition;
@@ -44,10 +47,13 @@ public class PlayerController : MonoBehaviour, PlayerInput
     [HideInInspector] public bool canDash = true;
     [HideInInspector] public Vector3 zeroVector = Vector3.zero;
     [HideInInspector] public Rigidbody2D rigidbody;
+    [HideInInspector] public bool facingRight = true;
 
 
     #region Private variables
     InputHandler<PlayerInput> inputHandler;
+
+
     #endregion
 
     #region Input Variables
@@ -96,11 +102,14 @@ public class PlayerController : MonoBehaviour, PlayerInput
     {
         stateMachine.CurrentlyRunningState.Execute();
         grounded = Physics2D.OverlapCircle(groundCheckPosition.position, groundCheckRadius, groundaLayermask);
+        animator.SetBool("InAir", !grounded);
     }
 
     void FixedUpdate()
     {
         stateMachine.FixedUpdate();
+
+        transform.rotation = Quaternion.Euler(transform.rotation.x, (facingRight) ? 0f : 180f, transform.rotation.z);
     }
 
     public void AerialStrafing()
@@ -113,6 +122,8 @@ public class PlayerController : MonoBehaviour, PlayerInput
     public void onMoveCallback(Vector2 value)
     {
         inputDirection = value;
+        if (Mathf.Abs(inputDirection.x) > 0.11f)
+            facingRight = inputDirection.x > 0.1f;
         //TODO: lägg till fastfall
     }
 
@@ -170,9 +181,9 @@ public class PlayerIdleState : State<PlayerController>
         //slow down
         owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, Vector3.zero, ref owner.zeroVector, owner.groundedMovementSmoothing);
 
-        RaycastHit2D hit1 = Physics2D.Raycast(owner.transform.position - new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
-        RaycastHit2D hit2 = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
-        RaycastHit2D hit3 = Physics2D.Raycast(owner.transform.position + new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit1 = Physics2D.Raycast(owner.transform.position - new Vector3(owner.playerWidth, 0f, 0f), Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit2 = Physics2D.Raycast(owner.transform.position, Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit3 = Physics2D.Raycast(owner.transform.position + new Vector3(owner.playerWidth, 0f, 0f), Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
 
         Vector2 sumOfNormals = Vector2.zero;
 
@@ -222,8 +233,9 @@ public class PlayerIdleState : State<PlayerController>
 
         //Debug.DrawRay(debugSumOfHitPoint, sumOfNormals * 3f);
 
-
         angleBetweenVectors = Vector3.SignedAngle(Vector3.up, sumOfNormals, Vector3.forward);
+
+        //owner.transform.rotation = Quaternion.Euler(owner.transform.rotation.x, (owner.facingRight) ? 0f : 180f, angleBetweenVectors);
     }
 
     public override void Exit()
@@ -244,6 +256,7 @@ public class PlayerWalkingState : State<PlayerController>
     public override void Enter()
     {
         Debug.Log("IM WALKING HERE!!!");
+        owner.animator.SetBool("IsMoving", true);
     }
 
     public override void Execute()
@@ -268,9 +281,9 @@ public class PlayerWalkingState : State<PlayerController>
 
     public override void FixedExecute()
     {
-        RaycastHit2D hit1 = Physics2D.Raycast(owner.transform.position - new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
-        RaycastHit2D hit2 = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
-        RaycastHit2D hit3 = Physics2D.Raycast(owner.transform.position + new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit1 = Physics2D.Raycast(owner.transform.position - new Vector3(owner.playerWidth, 0f, 0f), Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit2 = Physics2D.Raycast(owner.transform.position, Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit3 = Physics2D.Raycast(owner.transform.position + new Vector3(owner.playerWidth, 0f, 0f), Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
 
         Vector2 sumOfNormals = Vector2.zero;
 
@@ -297,7 +310,7 @@ public class PlayerWalkingState : State<PlayerController>
 
     public override void Exit()
     {
-
+        owner.animator.SetBool("IsMoving", false);
     }
 }
 
@@ -315,9 +328,9 @@ public class PlayerJumpingState : State<PlayerController>
         Debug.Log("YIPIEEE");
         jumpTimer = new Timer(owner.maxJumpTime);
         
-        RaycastHit2D hit1 = Physics2D.Raycast(owner.transform.position - new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
-        RaycastHit2D hit2 = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
-        RaycastHit2D hit3 = Physics2D.Raycast(owner.transform.position + new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit1 = Physics2D.Raycast(owner.transform.position - new Vector3(owner.playerWidth, 0f, 0f), Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit2 = Physics2D.Raycast(owner.transform.position, Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit3 = Physics2D.Raycast(owner.transform.position + new Vector3(owner.playerWidth, 0f, 0f), Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
 
         Vector2 sumOfNormals = Vector2.zero;
 
@@ -332,6 +345,8 @@ public class PlayerJumpingState : State<PlayerController>
         sumOfNormals.Normalize();
 
         owner.rigidbody.velocity = new Vector2(owner.rigidbody.velocity.x, 0f) + sumOfNormals * owner.jumpSpeed;
+
+        owner.animator.SetTrigger("Jump");
     }
 
     public override void Execute()
@@ -415,6 +430,8 @@ public class PlayerDashingState : State<PlayerController>
         dashDirection = (owner.inputDirection.magnitude > 0.03f) ? owner.inputDirection.normalized : Vector2.up;
         dashSpeed = (owner.rigidbody.velocity.magnitude + owner.dashSpeedIncrease > owner.dashMinSpeed) ? (owner.rigidbody.velocity.magnitude + owner.dashSpeedIncrease) : owner.dashMinSpeed;
 
+        owner.animator.SetBool("IsDashing", true);
+
         Debug.Log("Dashing");
     }
 
@@ -434,7 +451,7 @@ public class PlayerDashingState : State<PlayerController>
 
     public override void Exit()
     {
-
+        owner.animator.SetBool("IsDashing", false);
     }
 }
 
@@ -450,6 +467,7 @@ public class PlayerSlidingState : State<PlayerController>
     public override void Enter()
     {
         Debug.Log("slide");
+        owner.animator.SetBool("IsSliding", true);
     }
 
     public override void Execute()
@@ -470,9 +488,9 @@ public class PlayerSlidingState : State<PlayerController>
 
     public override void FixedExecute()
     {
-        RaycastHit2D hit1 = Physics2D.Raycast(owner.transform.position - new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
-        RaycastHit2D hit2 = Physics2D.Raycast(owner.transform.position, -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
-        RaycastHit2D hit3 = Physics2D.Raycast(owner.transform.position + new Vector3(owner.playerWidth, 0f, 0f), -owner.transform.up, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit1 = Physics2D.Raycast(owner.transform.position - new Vector3(owner.playerWidth, 0f, 0f), Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit2 = Physics2D.Raycast(owner.transform.position, Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
+        RaycastHit2D hit3 = Physics2D.Raycast(owner.transform.position + new Vector3(owner.playerWidth, 0f, 0f), Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
 
         Vector2 sumOfNormals = Vector2.zero;
 
@@ -496,7 +514,7 @@ public class PlayerSlidingState : State<PlayerController>
 
     public override void Exit()
     {
-
+        owner.animator.SetBool("IsSliding", false);
     }
 }
 
