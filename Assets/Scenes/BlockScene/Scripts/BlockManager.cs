@@ -45,7 +45,8 @@ public class BlockManager : MonoBehaviour
     private void AcceptClick() {
         if (this.enabledControls) {
             print("acceptingg");
-            Instantiate(this.blockObjects[0], this.inputManager.inputPosition, Quaternion.identity, this.transform);
+            var go = Instantiate(this.blockObjects[0], this.inputManager.inputPosition, Quaternion.identity, this.transform);
+            go.name = "Block " + (transform.childCount - 1);
             this.DisableControls();
         }
     }
