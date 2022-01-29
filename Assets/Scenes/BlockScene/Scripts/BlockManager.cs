@@ -33,18 +33,21 @@ public class BlockManager : MonoBehaviour
     }
 
     public void EnableControls() {
-        this.enabledControls = true;
         this.inputManager.onAcceptClick += AcceptClick;
+        this.enabledControls = true;
     }
 
     private void DisableControls() {
-        this.enabledControls = false;
         this.inputManager.onAcceptClick -= AcceptClick;
+        this.enabledControls = false;
     }
 
     private void AcceptClick() {
-        Instantiate(this.blockObjects[0], this.inputManager.inputPosition, Quaternion.identity, this.transform);
-        this.DisableControls();
+        if (this.enabledControls) {
+            print("acceptingg");
+            Instantiate(this.blockObjects[0], this.inputManager.inputPosition, Quaternion.identity, this.transform);
+            this.DisableControls();
+        }
     }
 
     // Update is called once per frame

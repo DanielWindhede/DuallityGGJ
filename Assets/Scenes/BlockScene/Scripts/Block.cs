@@ -36,6 +36,7 @@ public class Block : MonoBehaviour
         print("click!");
         this.hasBeenPlaced = true;
         this.body.bodyType = RigidbodyType2D.Static;
+        this.inputManager.onAcceptClick -= this.AcceptClick;
         transform.parent.GetComponent<BlockManager>().EnableControls();
     }
 }
