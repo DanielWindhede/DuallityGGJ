@@ -2,7 +2,7 @@ using UnityEngine;
 
 public interface BlockInput
 {
-  void onHorizontalCallback(float value);
+  void onDirectionCallback(Vector2 value);
   void onAcceptCallback();
   void onRotateAnalogCallback(float value);
   void onRotateAnalogReleaseCallback();
@@ -34,8 +34,8 @@ public class InputHandler<T>
     switch(input)
         {
             case BlockInput i:
-                this.inputActions.Block.Horizontal.Enable();
-                this.inputActions.Block.Horizontal.performed += context => i.onHorizontalCallback(context.ReadValue<float>());
+                this.inputActions.Block.Direction.Enable();
+                this.inputActions.Block.Direction.performed += context => i.onDirectionCallback(context.ReadValue<Vector2>());
 
                 this.inputActions.Block.Accept.Enable();
                 this.inputActions.Block.Accept.performed += _ => i.onAcceptCallback();
