@@ -1,17 +1,15 @@
 using UnityEngine;
 
-public class GlobalState {
-    public GlobalState() {}
-}
-
-public class GlobalStateObject : MonoBehaviour
+public class GlobalState : MonoBehaviour
 {
-    private static GlobalState _state;
-    public static GlobalState state {
-        get {
-            if (_state == null)
-                _state = new GlobalState();
-            return _state;
-        }
+    public static GlobalState state { get; private set; }
+
+    private void Awake() {
+        if (state != null && state != this)
+            Destroy(this);
+        else
+            state = this;
     }
+
+    public BlockInputManager blockInputManager;
 }
