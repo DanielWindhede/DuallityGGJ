@@ -17,6 +17,12 @@ public interface PlayerInput
     void onDashCallback(bool value);
 }
 
+public interface MenuInput {
+  void onDirectionCallback(int direction);
+  void onAcceptCallback();
+  void onBackCallback();
+}
+
 public class InputHandler<T>
 {
   private InputActions inputActions;
@@ -55,12 +61,24 @@ public class InputHandler<T>
                 this.inputActions.Player.Dash.Enable();
                 this.inputActions.Player.Dash.performed += context => i.onDashCallback(true);
                 break;
+            case MenuInput i:
+                this.inputActions.Menu.Direction.Enable();
+                this.inputActions.Menu.Direction.performed += context => i.onDirectionCallback((int)context.ReadValue<float>());
+
+                this.inputActions.Menu.Accept.Enable();
+                this.inputActions.Menu.Accept.performed += context => i.onAcceptCallback();
+
+                this.inputActions.Menu.Back.Enable();
+                this.inputActions.Menu.Back.performed += context => i.onBackCallback();
+                break;
         }
   }
 
   public void Unsubscribe()
   {
-    this.inputActions.Block.Horizontal.Disable();
+    this.inputActions.Block.Disable();
+    this.inputActions.Menu.Disable();
+    this.inputActions.Player.Disable();
     this.inputActions = null;
   }
 }
