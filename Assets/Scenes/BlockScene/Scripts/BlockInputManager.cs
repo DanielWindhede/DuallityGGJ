@@ -13,6 +13,7 @@ public class BlockInputManager : MonoBehaviour, BlockInput
     public event ButtonClick onRotateRelease;
 
     private float horzontalValue = 0;
+    private float verticalValue = 0;
     [SerializeField] private Camera camera;
     [SerializeField, Min(0)] private float width = 10f;
     private InputHandler<BlockInput> inputHandler;
@@ -27,6 +28,10 @@ public class BlockInputManager : MonoBehaviour, BlockInput
         }
     }
 
+    public float VerticalInput {
+        get { return this.verticalValue < 0 ? 1 : 0; }
+    }
+
     void Awake()
     {
         this.inputHandler = new InputHandler<BlockInput>();
@@ -38,8 +43,9 @@ public class BlockInputManager : MonoBehaviour, BlockInput
     }
 
     // Input Interface Implementation
-    public void onHorizontalCallback(float value) {
-        this.horzontalValue = value;
+    public void onDirectionCallback(Vector2 value) {
+        this.horzontalValue = value.x;
+        this.verticalValue = value.y;
     }
     public void onAcceptCallback() {
         this.onAcceptClick.Invoke();

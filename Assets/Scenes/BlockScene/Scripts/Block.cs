@@ -5,6 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class Block : MonoBehaviour
 {
+    [SerializeField] private float speedUpMultiplier = 1.5f;
     [SerializeField] private float rotationSpeed = 45f;
     private int rotationDirection = 0;
     [SerializeField] private float toggleRotationAmount = 45f;
@@ -56,7 +57,7 @@ public class Block : MonoBehaviour
                 this.rotationAngle += this.rotationSpeed * Time.fixedDeltaTime * this.rotationDirection;
             }
             var pos = this.inputManager.inputPosition;
-            offset -= offsetSpeed * Time.fixedDeltaTime;
+            offset -= offsetSpeed * Time.fixedDeltaTime * (1 + this.speedUpMultiplier * this.inputManager.VerticalInput);
             transform.position = new Vector3(pos.x, pos.y + offset, 0);
             this.transform.rotation = Quaternion.Euler(0, 0, this.rotationAngle);
         }
