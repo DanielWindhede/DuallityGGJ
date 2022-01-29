@@ -21,20 +21,22 @@ public class BlockContainer {
         this.heldBlocks = new List<Block>();
     }
 
-    public Block GetBlock(ContainerDirection direction) {
-        return this.heldBlocks[this.GetCycledIndex(direction)];
+    public Block GetCurrentBlock() {
+        return this.heldBlocks[this.currentIndex];
     }
 
     public Block Pop(ContainerDirection direction) {
-        var block = this.GetBlock(direction);
-        this.Remove(block);
-        this.Cycle(direction);
-        return block;
+        var block = this.heldBlocks[this.GetCycledIndex(direction)];
+        if (block) {
+            this.Remove(block);
+            this.CycleLeft();
+            return block;
+        }
+        return null;
     }
 
     public void Add(Block block) {
         if (this.heldBlocks.Count < maxItemCount) {
-            Debug.Log(this.heldBlocks);
             this.heldBlocks.Add(block);
         }
     }
@@ -43,7 +45,7 @@ public class BlockContainer {
         this.heldBlocks.Remove(block);
     }
 
-    public void Cycle(ContainerDirection directon) {
+    public void CycleToDirection(ContainerDirection directon) {
         this.currentIndex = GetCycledIndex(directon);
     }
 
@@ -56,25 +58,23 @@ public class BlockContainer {
             case ContainerDirection.Right:
                 dir = 1;
                 break;
-            default:
-                dir = 0;
-                break;
         }
+        Debug.Log(dir);
 
         int value = this.currentIndex + dir;
         if (value > this.heldBlocks.Count - 1)
-            return 0;
-        else if (value < 0)
             return this.heldBlocks.Count - 1;
+        else if (value < 0)
+            return 0;
         return value;
     }
 
     public void CycleRight() {
-        this.Cycle(ContainerDirection.Right);
+        this.CycleToDirection(ContainerDirection.Right);
     }
 
     public void CycleLeft() {
-        this.Cycle(ContainerDirection.Left);
+        this.CycleToDirection(ContainerDirection.Left);
     }
 }
 
@@ -85,10 +85,13 @@ public class BlockManager : MonoBehaviour
     [SerializeField] private Camera camera;
     private BlockInputManager inputManager;
 
+    [SerializeField] private float selectedScaleMultiplier = 1.25f;
+
     [SerializeField] private BlockContainer blockContainer;
     [SerializeField] private List<GameObject> blockObjects;
     [SerializeField] private Transform uiBlockContainerObject;
 
+    int maxItemCount = 3;
 
     // Start is called before the first frame update
     void Start()
@@ -98,15 +101,17 @@ public class BlockManager : MonoBehaviour
         this.LoadResources();
         this.camera = Camera.main;
 
-        int maxItemCount = 3;
         this.blockContainer = new BlockContainer(maxItemCount);
         for (int i = 0; i < maxItemCount; i++) {
-            this.blockContainer.Add(this.blockObjects[i].GetComponent<Block>());
+            var block = this.blockObjects[i].GetComponent<Block>();
+            this.blockContainer.Add(block);
             GameObject imageGO = new GameObject();
             imageGO.AddComponent<Image>().sprite = this.blockObjects[i].GetComponent<Block>().Icon;
 
-            Instantiate(imageGO, this.uiBlockContainerObject);
+            var go = Instantiate(imageGO, this.uiBlockContainerObject);
+            block.iconGameObject = go;
         }
+        this.CycleDirection(ContainerDirection.Right);
     } 
 
     private void LoadResources() {
@@ -140,14 +145,27 @@ public class BlockManager : MonoBehaviour
 
     private void AcceptClick() {
         if (this.enabledControls) {
-            var obj = Instantiate(this.blockContainer.Pop(ContainerDirection.Current), this.inputManager.inputPosition, Quaternion.identity, this.transform);
-            obj.name = "Block " + (transform.childCount - 1);
-            this.DisableControls();
+            var block = this.blockContainer.Pop(ContainerDirection.Current);
+            if (block)  {
+                if (block.iconGameObject)
+                    Destroy(block.iconGameObject);
+                
+                var obj = Instantiate(block, this.inputManager.inputPosition, Quaternion.identity, this.transform);
+                obj.name = "Block " + (transform.childCount - 1);
+                this.CycleDirection(ContainerDirection.Current);
+                this.DisableControls();
+            }
         }
     }
 
     private void Cycle(float value) {
-        this.blockContainer.Cycle((ContainerDirection)(int)value);
+        this.CycleDirection((ContainerDirection)(int)value);
+    }
+
+    private void CycleDirection(ContainerDirection value) {
+        this.blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one;
+        this.blockContainer.CycleToDirection(value);
+        this.blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one * selectedScaleMultiplier;
     }
 
     private void OnDrawGizmos() {

@@ -31,6 +31,8 @@ public class Block : MonoBehaviour
         get { return this.icon; }
     }
 
+    public GameObject iconGameObject;
+
     // Start is called before the first frame update
     void Start() {
         this.body = GetComponent<Rigidbody2D>();
