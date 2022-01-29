@@ -12,4 +12,5 @@ public class GlobalState : MonoBehaviour
     }
 
     public BlockInputManager blockInputManager;
+    public float score;
 }
