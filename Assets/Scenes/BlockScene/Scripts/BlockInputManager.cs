@@ -4,18 +4,20 @@ using UnityEngine;
 
 public class BlockInputManager : MonoBehaviour, BlockInput
 {
+    [SerializeField] private Camera camera;
+    [SerializeField, Min(0)] private float width = 10f;
+
     public delegate void ButtonClick();
     public delegate void FloatFunc(float value);
     public event ButtonClick onAcceptClick;
     public event ButtonClick onRotateLeftClick;
     public event ButtonClick onRotateRightClick;
     public event FloatFunc onRotationAnalog;
+    public event FloatFunc onCycle;
     public event ButtonClick onRotateRelease;
 
     private float horzontalValue = 0;
     private float verticalValue = 0;
-    [SerializeField] private Camera camera;
-    [SerializeField, Min(0)] private float width = 10f;
     private InputHandler<BlockInput> inputHandler;
 
     public Vector2 inputPosition {
@@ -32,7 +34,7 @@ public class BlockInputManager : MonoBehaviour, BlockInput
         get { return this.verticalValue < 0 ? 1 : 0; }
     }
 
-    void Awake()
+    private void Awake()
     {
         this.inputHandler = new InputHandler<BlockInput>();
         this.inputHandler.Subscribe(this);
@@ -42,32 +44,14 @@ public class BlockInputManager : MonoBehaviour, BlockInput
         this.inputHandler.Unsubscribe();
     }
 
-    // Input Interface Implementation
     public void onDirectionCallback(Vector2 value) {
         this.horzontalValue = value.x;
         this.verticalValue = value.y;
     }
-    public void onAcceptCallback() {
-        this.onAcceptClick.Invoke();
-    }
-
-    public void onRotateAnalogCallback(float value)
-    {
-        this.onRotationAnalog.Invoke(value);
-    }
-
-    public void onRotateDigitalLeftCallback()
-    {
-        this.onRotateLeftClick.Invoke();
-    }
-
-    public void onRotateDigitalRightCallback()
-    {
-        this.onRotateRightClick.Invoke();
-    }
-
-    public void onRotateAnalogReleaseCallback()
-    {
-        this.onRotateRelease.Invoke();
-    }
+    public void onAcceptCallback() { this.onAcceptClick.Invoke(); }
+    public void onRotateAnalogCallback(float value) { this.onRotationAnalog.Invoke(value); }
+    public void onRotateDigitalLeftCallback() { this.onRotateLeftClick.Invoke(); }
+    public void onRotateDigitalRightCallback() { this.onRotateRightClick.Invoke(); }
+    public void onRotateAnalogReleaseCallback() { this.onRotateRelease.Invoke(); }
+    public void onCycleCallback(float value) { this.onCycle.Invoke(value); }
 }

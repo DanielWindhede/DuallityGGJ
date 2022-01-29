@@ -1,19 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public class Block : MonoBehaviour
 {
+    [SerializeField] private Sprite icon;
     [SerializeField] private float speedUpMultiplier = 1.5f;
     [SerializeField] private float rotationSpeed = 45f;
-    private int rotationDirection = 0;
+    [SerializeField] private float offsetSpeed = 0.5f;
     [SerializeField] private float toggleRotationAmount = 45f;
+    private int rotationDirection = 0;
     private float rotationAngle;
     private List<Collider2D> collisions;
     private Collider2D collider;
     private Rigidbody2D body;
-    [SerializeField] private float offsetSpeed = 0.5f;
     private float offset = 0;
     private BlockInputManager inputManager;
     private bool hasBeenPlaced = false;
@@ -24,6 +26,12 @@ public class Block : MonoBehaviour
     public BlockManager BlockManager {
         get { return this._blockManager; }
     }
+
+    public Sprite Icon {
+        get { return this.icon; }
+    }
+
+    public GameObject iconGameObject;
 
     // Start is called before the first frame update
     void Start() {

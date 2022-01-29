@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7540660708217721746}
   - component: {fileID: 8565131310950631392}
   m_Layer: 0
-  m_Name: BlockCube
+  m_Name: block_cube_magma
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -145,6 +145,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfe0f265b631b5b4498d37fa72a8729f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  icon: {fileID: 21300000, guid: 96ef05b18836f574da16918246ea853c, type: 3}
+  speedUpMultiplier: 1.5
   rotationSpeed: 45
-  toggleRotationAmount: 45
   offsetSpeed: 3
+  toggleRotationAmount: 45
