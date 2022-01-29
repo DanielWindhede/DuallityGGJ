@@ -10,6 +10,7 @@ public interface PlayerInput
 {
     void onMoveCallback(Vector2 value);
     void onJumpCallback(bool value);
+    void onDashCallback(bool value);
 }
 
 public class InputHandler<T>
@@ -37,6 +38,9 @@ public class InputHandler<T>
                 this.inputActions.Player.Jump.Enable();
                 this.inputActions.Player.Jump.performed += context => i.onJumpCallback(true);
                 this.inputActions.Player.Jump.canceled += context => i.onJumpCallback(false);
+
+                this.inputActions.Player.Dash.Enable();
+                this.inputActions.Player.Dash.performed += context => i.onDashCallback(true);
                 break;
         }
   }
