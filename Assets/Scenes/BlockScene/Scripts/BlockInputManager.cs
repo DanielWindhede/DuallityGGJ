@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class BlockInputManager : MonoBehaviour, BlockInput
 {
-    [SerializeField] private Camera camera;
-    [SerializeField, Min(0)] private float width = 10f;
+    [SerializeField] private Camera _camera;
+    [SerializeField, Min(0)] private float _controlWidth = 10f;
 
     public delegate void ButtonClick();
     public delegate void FloatFunc(float value);
@@ -16,37 +16,37 @@ public class BlockInputManager : MonoBehaviour, BlockInput
     public event FloatFunc onCycle;
     public event ButtonClick onRotateRelease;
 
-    private float horzontalValue = 0;
-    private float verticalValue = 0;
-    private InputHandler<BlockInput> inputHandler;
+    private float _horzontalValue = 0;
+    private float _verticalValue = 0;
+    private InputHandler<BlockInput> _inputHandler;
 
     public Vector2 inputPosition {
         get {
             var offset = Vector2.up * 3;
-            var pos = this.camera.transform.position;
+            var pos = this._camera.transform.position;
             Vector2 centerPosition = new Vector2(pos.x, pos.y);
 
-            return centerPosition + Vector2.right * this.width / 2 * this.horzontalValue + offset;
+            return centerPosition + Vector2.right * this._controlWidth / 2 * this._horzontalValue + offset;
         }
     }
 
     public float VerticalInput {
-        get { return this.verticalValue < 0 ? 1 : 0; }
+        get { return this._verticalValue < 0 ? 1 : 0; }
     }
 
     private void Awake()
     {
-        this.inputHandler = new InputHandler<BlockInput>();
-        this.inputHandler.Subscribe(this);
+        this._inputHandler = new InputHandler<BlockInput>();
+        this._inputHandler.Subscribe(this);
     }
 
     private void OnDestroy() {
-        this.inputHandler.Unsubscribe();
+        this._inputHandler.Unsubscribe();
     }
 
     public void onDirectionCallback(Vector2 value) {
-        this.horzontalValue = value.x;
-        this.verticalValue = value.y;
+        this._horzontalValue = value.x;
+        this._verticalValue = value.y;
     }
     public void onAcceptCallback() { this.onAcceptClick.Invoke(); }
     public void onRotateAnalogCallback(float value) { this.onRotationAnalog.Invoke(value); }
