@@ -44,6 +44,33 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RotateAnalog"",
+                    ""type"": ""Value"",
+                    ""id"": ""2f601fc4-d2a4-4542-9361-a4db5c1a996e"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""RotateDigitalLeft"",
+                    ""type"": ""Button"",
+                    ""id"": ""b3e3765b-324f-44c2-b084-0b0d59b23d35"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""RotateDigitalRight"",
+                    ""type"": ""Button"",
+                    ""id"": ""605f1e52-478f-4cc2-9833-cc1b3af93262"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -90,6 +117,61 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""action"": ""Accept"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""424c7285-0543-4bc4-b251-3c0c77fdbe43"",
+                    ""path"": ""<XInputController>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotateDigitalLeft"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bdd266e8-5a7e-43c2-a366-3364d294451f"",
+                    ""path"": ""<XInputController>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotateDigitalRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""2ced20b5-35de-4eed-b0d4-bb532a2e5d58"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotateAnalog"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""c1bc5df7-44b6-49c4-8c8a-18df18c0d656"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotateAnalog"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""61398843-6e24-4ff6-8453-423d3dbdac5e"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotateAnalog"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -179,6 +261,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         m_Block = asset.FindActionMap("Block", throwIfNotFound: true);
         m_Block_Horizontal = m_Block.FindAction("Horizontal", throwIfNotFound: true);
         m_Block_Accept = m_Block.FindAction("Accept", throwIfNotFound: true);
+        m_Block_RotateAnalog = m_Block.FindAction("RotateAnalog", throwIfNotFound: true);
+        m_Block_RotateDigitalLeft = m_Block.FindAction("RotateDigitalLeft", throwIfNotFound: true);
+        m_Block_RotateDigitalRight = m_Block.FindAction("RotateDigitalRight", throwIfNotFound: true);
         // Player
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
@@ -245,12 +330,18 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     private IBlockActions m_BlockActionsCallbackInterface;
     private readonly InputAction m_Block_Horizontal;
     private readonly InputAction m_Block_Accept;
+    private readonly InputAction m_Block_RotateAnalog;
+    private readonly InputAction m_Block_RotateDigitalLeft;
+    private readonly InputAction m_Block_RotateDigitalRight;
     public struct BlockActions
     {
         private @InputActions m_Wrapper;
         public BlockActions(@InputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Horizontal => m_Wrapper.m_Block_Horizontal;
         public InputAction @Accept => m_Wrapper.m_Block_Accept;
+        public InputAction @RotateAnalog => m_Wrapper.m_Block_RotateAnalog;
+        public InputAction @RotateDigitalLeft => m_Wrapper.m_Block_RotateDigitalLeft;
+        public InputAction @RotateDigitalRight => m_Wrapper.m_Block_RotateDigitalRight;
         public InputActionMap Get() { return m_Wrapper.m_Block; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -266,6 +357,15 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @Accept.started -= m_Wrapper.m_BlockActionsCallbackInterface.OnAccept;
                 @Accept.performed -= m_Wrapper.m_BlockActionsCallbackInterface.OnAccept;
                 @Accept.canceled -= m_Wrapper.m_BlockActionsCallbackInterface.OnAccept;
+                @RotateAnalog.started -= m_Wrapper.m_BlockActionsCallbackInterface.OnRotateAnalog;
+                @RotateAnalog.performed -= m_Wrapper.m_BlockActionsCallbackInterface.OnRotateAnalog;
+                @RotateAnalog.canceled -= m_Wrapper.m_BlockActionsCallbackInterface.OnRotateAnalog;
+                @RotateDigitalLeft.started -= m_Wrapper.m_BlockActionsCallbackInterface.OnRotateDigitalLeft;
+                @RotateDigitalLeft.performed -= m_Wrapper.m_BlockActionsCallbackInterface.OnRotateDigitalLeft;
+                @RotateDigitalLeft.canceled -= m_Wrapper.m_BlockActionsCallbackInterface.OnRotateDigitalLeft;
+                @RotateDigitalRight.started -= m_Wrapper.m_BlockActionsCallbackInterface.OnRotateDigitalRight;
+                @RotateDigitalRight.performed -= m_Wrapper.m_BlockActionsCallbackInterface.OnRotateDigitalRight;
+                @RotateDigitalRight.canceled -= m_Wrapper.m_BlockActionsCallbackInterface.OnRotateDigitalRight;
             }
             m_Wrapper.m_BlockActionsCallbackInterface = instance;
             if (instance != null)
@@ -276,6 +376,15 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 @Accept.started += instance.OnAccept;
                 @Accept.performed += instance.OnAccept;
                 @Accept.canceled += instance.OnAccept;
+                @RotateAnalog.started += instance.OnRotateAnalog;
+                @RotateAnalog.performed += instance.OnRotateAnalog;
+                @RotateAnalog.canceled += instance.OnRotateAnalog;
+                @RotateDigitalLeft.started += instance.OnRotateDigitalLeft;
+                @RotateDigitalLeft.performed += instance.OnRotateDigitalLeft;
+                @RotateDigitalLeft.canceled += instance.OnRotateDigitalLeft;
+                @RotateDigitalRight.started += instance.OnRotateDigitalRight;
+                @RotateDigitalRight.performed += instance.OnRotateDigitalRight;
+                @RotateDigitalRight.canceled += instance.OnRotateDigitalRight;
             }
         }
     }
@@ -333,6 +442,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     {
         void OnHorizontal(InputAction.CallbackContext context);
         void OnAccept(InputAction.CallbackContext context);
+        void OnRotateAnalog(InputAction.CallbackContext context);
+        void OnRotateDigitalLeft(InputAction.CallbackContext context);
+        void OnRotateDigitalRight(InputAction.CallbackContext context);
     }
     public interface IPlayerActions
     {
