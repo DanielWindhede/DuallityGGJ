@@ -332,8 +332,6 @@ public class PlayerJumpingState : State<PlayerController>
         sumOfNormals.Normalize();
 
         owner.rigidbody.velocity = new Vector2(owner.rigidbody.velocity.x, 0f) + sumOfNormals * owner.jumpSpeed;
-        //owner.rigidbody.velocity = sumOfNormals * owner.jumpSpeed;
-
     }
 
     public override void Execute()
