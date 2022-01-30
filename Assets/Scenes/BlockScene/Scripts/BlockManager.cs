@@ -82,7 +82,7 @@ public class BlockManager : MonoBehaviour
     }
 
     private void LoadResources() {
-        string path = "Blocks\\" + (this._loadPlaceholderResources ? "Placeholders" : "") + "\\";
+        string path = "Blocks\\" + (this._loadPlaceholderResources ? "Placeholders\\" : "");
         this._blockObjects = new List<GameObject>();
 
         var resources = Resources.LoadAll<GameObject>(path);
