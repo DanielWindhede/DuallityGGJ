@@ -178,6 +178,7 @@ MonoBehaviour:
   audioSource: {fileID: 2139142493}
   sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   sprite1: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  clickSound: {fileID: 8300000, guid: e06e3877dbb4348a8ab19cd3df0c69ac, type: 3}
   type: 0
 --- !u!222 &301150401
 CanvasRenderer:
@@ -263,6 +264,18 @@ MonoBehaviour:
         - m_Target: {fileID: 301150399}
           m_TargetAssemblyTypeName: MenuItem, Assembly-CSharp
           m_MethodName: ChangeSpriteBack
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 301150399}
+          m_TargetAssemblyTypeName: MenuItem, Assembly-CSharp
+          m_MethodName: PlaySound
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -925,6 +938,7 @@ MonoBehaviour:
   audioSource: {fileID: 2139142493}
   sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   sprite1: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  clickSound: {fileID: 0}
   type: 1
 --- !u!222 &1759662718
 CanvasRenderer:

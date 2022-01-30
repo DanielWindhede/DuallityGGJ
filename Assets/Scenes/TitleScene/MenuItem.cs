@@ -20,23 +20,8 @@ public class MenuItem : MonoBehaviour
     [SerializeField] private MenuActionType type;
 
     public void PlaySound()
-    {
-        audioSource.PlayOneShot(clickSound, 1);
-    }
-
-    public void ChangeSprite()
-    {
-
-    }
-
-    public void ChangeSpriteBack()
-    {
-
-    }
-
-    public void PlaySound()
     {
-        audioSource.Play();
+        audioSource.PlayOneShot(clickSound, 1);
     }
 
     public void ChangeSprite()

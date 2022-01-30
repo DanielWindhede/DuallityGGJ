@@ -20,6 +20,11 @@ public class BlockManager : MonoBehaviour
     public float blockSpeedUpMultiplier = 1.5f;
     public float blockRotationSpeed = 45f;
     public float blockToggleRotationAmount = 45f;
+    public AudioSource blockCycle;
+    public AudioClip blockCycleSound;
+    public AudioSource blockPlace;
+    public AudioSource blockSelect;
+
 
     private bool _enabledControls = true;
     private BlockInputManager _inputManager;
@@ -82,6 +87,12 @@ public class BlockManager : MonoBehaviour
         }
     }
 
+    public void PlayPlacementSound()
+    {
+        blockSelect.Play();
+
+    }
+
     private void LoadResources() {
         string path = "Blocks\\" + (this._loadPlaceholderResources ? "Placeholders\\" : "");
         this._blockObjects = new List<GameObject>();
@@ -108,6 +119,7 @@ public class BlockManager : MonoBehaviour
                 var iconObject = this._uiBlockContainerObject.GetChild(iconIndex);
                 if (iconObject) {
                     Destroy(iconObject.gameObject);
+                    blockSelect.Play();
                 }
                 
                 var obj = Instantiate(block, this._inputManager.inputPosition, Quaternion.identity, this.transform);
@@ -129,6 +141,10 @@ public class BlockManager : MonoBehaviour
         this._uiBlockContainerObject.GetChild(this._blockContainer.CurrentIndex + offset).transform.localScale = Vector3.one;
         this._blockContainer.CycleToDirection(value);
         this._uiBlockContainerObject.GetChild(this._blockContainer.CurrentIndex + offset).transform.localScale = Vector3.one * _selectedScaleMultiplier;
+        if (value != ContainerDirection.Current)
+        {
+            blockCycle.PlayOneShot(blockCycleSound, 1);
+        }
     }
 
     private void OnDrawGizmos() {
