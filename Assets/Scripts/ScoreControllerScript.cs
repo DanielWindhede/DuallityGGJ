@@ -13,7 +13,7 @@ public class ScoreControllerScript : MonoBehaviour {
     static float mStartPos;
     public float startPos { get { return mStartPos; } set { mStartPos = value; } }
 
-    GlobalState gs = new GlobalState();
+    
 
     void Start ()
     {
@@ -22,12 +22,12 @@ public class ScoreControllerScript : MonoBehaviour {
 
     private void Update()
     {
-        gs.score = (int)((transform.position.y - startPos) * scoreMultiplier);
+        GlobalState.state.score = (int)((transform.position.y - startPos) * scoreMultiplier);
         UpdateScore();
     }
 
     void UpdateScore()
     {
-        scoreText.text = "Score: " + gs.score;
+        scoreText.text = "Score: " + GlobalState.state.score;
     }
 }
