@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 
@@ -8,8 +9,8 @@ using UnityEngine.EventSystems;
 public class MenuItem : MonoBehaviour
 {
     [SerializeField] AudioSource audioSource;
-    [SerializeField] GameObject sprite;
-    [SerializeField] GameObject sprite1;
+    [SerializeField] Sprite sprite;
+    [SerializeField] Sprite sprite1;
     public enum MenuActionType {
         Play,
         Quit,
@@ -24,12 +25,12 @@ public class MenuItem : MonoBehaviour
 
     public void ChangeSprite()
     {
-
+        GetComponent<Image>().sprite = sprite;
     }
 
     public void ChangeSpriteBack()
     {
-
+        GetComponent<Image>().sprite = sprite1;
     }
 
     public void PerformAction() {
