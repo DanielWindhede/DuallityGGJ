@@ -52,6 +52,7 @@ public class PlayerController : MonoBehaviour, PlayerInput
     public float dashTime;
     public float dashSpeedIncrease;
     public float dashMinSpeed;
+    public TrailRenderer dashTrail;
 
     [Header("Block Property Variables")]
     [Range(0, .3f)] public float slipperyGroundedMovementSmoothing = .1f;
@@ -573,6 +574,10 @@ public class PlayerDashingState : State<PlayerController>
 
         owner.dashAudioSource.Play();
 
+        //owner.gameObject.SetActive(owner.dashTrail,true);
+
+        owner.dashTrail.enabled = true;
+
         Debug.Log("Dashing");
     }
 
@@ -592,6 +597,7 @@ public class PlayerDashingState : State<PlayerController>
 
     public override void Exit()
     {
+        owner.dashTrail.enabled = false;
         owner.animator.SetBool("IsDashing", false);
     }
 }
