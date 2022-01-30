@@ -1015,7 +1015,11 @@ MonoBehaviour:
   audioSource: {fileID: 2139142493}
   sprite: {fileID: 21300000, guid: d32e49edab729aa4babbeb5640805ddb, type: 3}
   sprite1: {fileID: 21300000, guid: dc279405a0f947047b34b1e706443346, type: 3}
+<<<<<<< Updated upstream
   clickSound: {fileID: 0}
+=======
+  clickSound: {fileID: 8300000, guid: 07f09f496308bc948b73fe384a731a25, type: 3}
+>>>>>>> Stashed changes
   type: 1
 --- !u!222 &1759662718
 CanvasRenderer:
