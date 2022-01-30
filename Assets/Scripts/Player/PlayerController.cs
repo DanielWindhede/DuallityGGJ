@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour, PlayerInput
     public PlayerFallingState fallingState;
     public PlayerDashingState dashingState;
     public PlayerSlidingState slidingState;
+    public PlayerBounceState playerBounceState;
     #endregion
 
     [Header("Animation")]
@@ -105,6 +106,7 @@ public class PlayerController : MonoBehaviour, PlayerInput
         fallingState = new PlayerFallingState(this);
         dashingState = new PlayerDashingState(this);
         slidingState = new PlayerSlidingState(this);
+        playerBounceState = new PlayerBounceState(this);
 
         stateMachine.ChangeState(idleState);
 
@@ -185,7 +187,7 @@ public class PlayerController : MonoBehaviour, PlayerInput
         //    shouldBounce = false;
         //}
 
-        transform.rotation = Quaternion.Euler(transform.rotation.x, (facingRight) ? 0f : 180f, transform.rotation.z);
+        //transform.rotation = Quaternion.Euler(transform.rotation.x, (facingRight) ? 0f : 180f, transform.rotation.z);
     }
 
     public void AerialStrafing()
@@ -199,17 +201,18 @@ public class PlayerController : MonoBehaviour, PlayerInput
         lastCollisionRelativeVelocity = collision.relativeVelocity;
         lastCollisionContactNormal = collision.contacts[0].normal;
 
-        //if (collision.gameObject.GetComponent<BlockProperty>() != null)
-        //{
-        //    if (collision.gameObject.GetComponent<BlockProperty>().property == BlockProperty.Property.Bouncy)
-        //    {
-        //        if (collision.relativeVelocity.magnitude > minimumSpeedToBounce)
-        //        {
-        //            shouldBounce = true;
-        //            postBounceVelocity = Vector2.Reflect(rigidbody.velocity, collision.contacts[0].normal) * bouncyBlockSpeedRetention;
-        //        }
-        //    }
-        //}
+        if (collision.gameObject.GetComponent<BlockProperty>() != null)
+        {
+            if (collision.gameObject.GetComponent<BlockProperty>().property == BlockProperty.Property.Bouncy)
+            {
+                if (collision.relativeVelocity.magnitude > minimumSpeedToBounce)
+                {
+                    stateMachine.ChangeState(playerBounceState);
+                    //shouldBounce = true;
+                    //postBounceVelocity = Vector2.Reflect(rigidbody.velocity, collision.contacts[0].normal) * bouncyBlockSpeedRetention;
+                }
+            }
+        }
     }
 
     #region Input Callbacks
@@ -490,42 +493,46 @@ public class PlayerFallingState : State<PlayerController>
     {
         if (owner.grounded)
         {
-            Collider2D currentGroundCollider = Physics2D.OverlapBox(owner.groundCheckPosition.position, new Vector2(owner.groundCheckWidth, owner.groundCheckHeight + 0.5f), 0f, owner.groundaLayermask);
-            if (currentGroundCollider != null)
-            {
-                if (currentGroundCollider.gameObject.GetComponent<BlockProperty>() != null)
-                {
-                    if (currentGroundCollider.gameObject.GetComponent<BlockProperty>().property == BlockProperty.Property.Bouncy)
-                    {
-                        if (Mathf.Abs(owner.lastCollisionRelativeVelocity.y) > owner.minimumSpeedToBounce)
-                        {
-                            owner.bounceAudioSource.Play();
-                            owner.stateMachine.ChangeState(owner.jumpingState);
-                        }
-                        else
-                        {
-                            Debug.Log("no speed");
-                            owner.stateMachine.ChangeState(owner.idleState);
-                        }
-                    }
-                    else
-                    {
-                        Debug.Log("not bounce");
+            //Collider2D currentGroundCollider = Physics2D.OverlapBox(owner.groundCheckPosition.position, new Vector2(owner.groundCheckWidth, owner.groundCheckHeight + 0.5f), 0f, owner.groundaLayermask);
+            //if (currentGroundCollider != null)
+            //{
+            //    if (currentGroundCollider.gameObject.GetComponent<BlockProperty>() != null)
+            //    {
+            //        if (currentGroundCollider.gameObject.GetComponent<BlockProperty>().property == BlockProperty.Property.Bouncy)
+            //        {
+            //            if (Mathf.Abs(owner.lastCollisionRelativeVelocity.y) > owner.minimumSpeedToBounce)
+            //            {
+            //                //owner.stateMachine.ChangeState(owner.playerBounceState);
 
-                        owner.stateMachine.ChangeState(owner.idleState);
-                    }
-                }
-                else
-                {
-                    Debug.Log("no block");
-                    owner.stateMachine.ChangeState(owner.idleState);
-                }
-            }
-            else
-            {
-                Debug.Log("no excist?!?!");
-                owner.stateMachine.ChangeState(owner.idleState);
-            }
+            //                //owner.bounceAudioSource.Play();
+            //                //owner.stateMachine.ChangeState(owner.jumpingState);
+            //            }
+            //            else
+            //            {
+            //                Debug.Log("no speed");
+            //                owner.stateMachine.ChangeState(owner.idleState);
+            //            }
+            //        }
+            //        else
+            //        {
+            //            Debug.Log("not bounce");
+
+            //            owner.stateMachine.ChangeState(owner.idleState);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        Debug.Log("no block");
+            //        owner.stateMachine.ChangeState(owner.idleState);
+            //    }
+            //}
+            //else
+            //{
+            //    Debug.Log("no excist?!?!");
+            //    owner.stateMachine.ChangeState(owner.idleState);
+            //}
+
+            owner.stateMachine.ChangeState(owner.idleState);
         }
     }
 
@@ -652,7 +659,36 @@ public class PlayerSlidingState : State<PlayerController>
     }
 }
 
+public class PlayerBounceState : State<PlayerController>
+{
 
+    public PlayerBounceState(PlayerController owner)
+    {
+        this.owner = owner;
+    }
+
+    public override void Enter()
+    {
+        Debug.Log("boing");
+        owner.bounceAudioSource.Play();
+        owner.rigidbody.velocity = Vector2.Reflect(-owner.lastCollisionRelativeVelocity, owner.lastCollisionContactNormal) * owner.bouncyBlockSpeedRetention;
+    }
+
+    public override void Execute()
+    {
+        owner.stateMachine.ChangeState(owner.fallingState);
+    }
+
+    public override void FixedExecute()
+    {
+
+    }
+
+    public override void Exit()
+    {
+
+    }
+}
 
 
 public class PlayerCopyState : State<PlayerController>
