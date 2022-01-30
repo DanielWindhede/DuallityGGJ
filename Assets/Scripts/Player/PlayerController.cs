@@ -187,7 +187,7 @@ public class PlayerController : MonoBehaviour, PlayerInput
         //    shouldBounce = false;
         //}
 
-        //transform.rotation = Quaternion.Euler(transform.rotation.x, (facingRight) ? 0f : 180f, transform.rotation.z);
+        transform.rotation = Quaternion.Euler(transform.rotation.x, (facingRight) ? 0f : 180f, transform.rotation.z);
     }
 
     public void AerialStrafing()

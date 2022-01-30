@@ -6,7 +6,7 @@ using TMPro;
 
 public class ScoreControllerScript : MonoBehaviour {
 
-    [SerializeField] TextMeshPro scoreText;
+    [SerializeField] TextMeshProUGUI scoreText;
     [SerializeField] float scoreMultiplier;
 
 
