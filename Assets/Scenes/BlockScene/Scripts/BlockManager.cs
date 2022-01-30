@@ -22,15 +22,19 @@ public class BlockContainer {
     }
 
     public Block GetCurrentBlock() {
-        return this.heldBlocks[this.currentIndex];
+        if (this.heldBlocks.Count - 1 >= this.currentIndex)
+            return this.heldBlocks[this.currentIndex];
+        return null;
     }
 
     public Block Pop(ContainerDirection direction) {
-        var block = this.heldBlocks[this.GetCycledIndex(direction)];
-        if (block) {
-            this.Remove(block);
-            this.CycleLeft();
-            return block;
+        if (this.heldBlocks.Count > 0) {
+            var block = this.heldBlocks[this.GetCycledIndex(direction)];
+            if (block) {
+                this.Remove(block);
+                this.CycleLeft();
+                return block;
+            }
         }
         return null;
     }
@@ -86,12 +90,16 @@ public class BlockManager : MonoBehaviour
     [SerializeField] private List<GameObject> _blockObjects;
     [SerializeField] private Transform _uiBlockContainerObject;
     [SerializeField] private int _maxItemCount = 3;
+    [SerializeField] private float cooldownTime = 1f;
 
     private bool _enabledControls = true;
     private BlockInputManager _inputManager;
+    private Timer _cooldownTimer;
+    private bool _useTimer;
 
     private void Start()
     {
+        this._cooldownTimer = new Timer(cooldownTime);
         this._inputManager = GlobalState.state.blockInputManager;
         this.EnableControls();
         this.LoadResources();
@@ -108,7 +116,17 @@ public class BlockManager : MonoBehaviour
             block.iconGameObject = go;
         }
         this.CycleDirection(ContainerDirection.Right);
-    } 
+    }
+
+    private void FixedUpdate() {
+        if (this._useTimer) {
+            this._cooldownTimer += Time.fixedDeltaTime;
+            if (this._cooldownTimer.Done) {
+                this._useTimer = false;
+                this._cooldownTimer.Reset();
+            }
+        }
+    }
 
     public void EnableControls() {
         this._inputManager.onAcceptClick += AcceptClick;
@@ -141,7 +159,7 @@ public class BlockManager : MonoBehaviour
     }
 
     private void AcceptClick() {
-        if (this._enabledControls) {
+        if (this._enabledControls && !this._useTimer) {
             var block = this._blockContainer.Pop(ContainerDirection.Current);
             if (block)  {
                 if (block.iconGameObject)
@@ -151,6 +169,7 @@ public class BlockManager : MonoBehaviour
                 obj.name = "Block " + (transform.childCount - 1);
                 this.CycleDirection(ContainerDirection.Current);
                 this.DisableControls();
+                this._useTimer = true;
             }
         }
     }
@@ -160,9 +179,14 @@ public class BlockManager : MonoBehaviour
     }
 
     private void CycleDirection(ContainerDirection value) {
-        this._blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one;
-        this._blockContainer.CycleToDirection(value);
-        this._blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one * _selectedScaleMultiplier;
+        if (this._blockContainer.GetCurrentBlock()) {
+            this._blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one;
+            this._blockContainer.CycleToDirection(value);
+
+            if (this._blockContainer.GetCurrentBlock()) {
+                this._blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one * _selectedScaleMultiplier;
+            }
+        }
     }
 
     private void OnDrawGizmos() {
