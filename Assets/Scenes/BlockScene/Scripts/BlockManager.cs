@@ -16,6 +16,8 @@ public class BlockManager : MonoBehaviour
     [SerializeField] private Transform _uiTargetObject;
     [SerializeField] private int _maxItemCount = 3;
     [SerializeField] private float cooldownTime = 1f;
+    public float blockOffsetSpeed = 0.5f;
+    public float blockSpeedUpMultiplier = 1.5f;
 
     private bool _enabledControls = true;
     private BlockInputManager _inputManager;

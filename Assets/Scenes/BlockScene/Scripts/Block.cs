@@ -7,9 +7,7 @@ using UnityEngine.UI;
 public class Block : MonoBehaviour
 {
     [SerializeField] private Sprite icon;
-    [SerializeField] private float speedUpMultiplier = 1.5f;
     [SerializeField] private float rotationSpeed = 45f;
-    [SerializeField] private float offsetSpeed = 0.5f;
     [SerializeField] private float toggleRotationAmount = 45f;
     [SerializeField] private float _spawnWeight = 10;
     private int rotationDirection = 0;
@@ -68,7 +66,7 @@ public class Block : MonoBehaviour
                 this.rotationAngle += this.rotationSpeed * Time.fixedDeltaTime * this.rotationDirection;
             }
             var pos = this.inputManager.inputPosition;
-            offset -= offsetSpeed * Time.fixedDeltaTime * (1 + this.speedUpMultiplier * this.inputManager.VerticalInput);
+            offset -= this.BlockManager.blockOffsetSpeed * Time.fixedDeltaTime * (1 + this.BlockManager.blockSpeedUpMultiplier * this.inputManager.VerticalInput);
             transform.position = new Vector3(pos.x, pos.y + offset, 0);
             this.transform.rotation = Quaternion.Euler(0, 0, this.rotationAngle);
         }

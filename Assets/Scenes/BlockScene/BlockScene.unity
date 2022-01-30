@@ -321,6 +321,8 @@ MonoBehaviour:
   _uiTargetObject: {fileID: 630964409}
   _maxItemCount: 3
   cooldownTime: 1
+  blockOffsetSpeed: 3
+  blockSpeedUpMultiplier: 1.5
 --- !u!4 &354908297
 Transform:
   m_ObjectHideFlags: 0
