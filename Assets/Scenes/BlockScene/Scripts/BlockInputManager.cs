@@ -5,7 +5,7 @@ using UnityEngine;
 public class BlockInputManager : MonoBehaviour, BlockInput
 {
     [SerializeField, Min(0)] private float _controlWidth = 10f;
-
+    [SerializeField] private float _inputPositionYOffset = 3;
     public delegate void ButtonClick();
     public delegate void FloatFunc(float value);
     public event ButtonClick onAcceptClick;
@@ -22,7 +22,7 @@ public class BlockInputManager : MonoBehaviour, BlockInput
 
     public Vector2 inputPosition {
         get {
-            var offset = Vector2.up * 3;
+            var offset = Vector2.up * this._inputPositionYOffset;
             var pos = this._camera.transform.position;
             Vector2 centerPosition = new Vector2(pos.x, pos.y);
 

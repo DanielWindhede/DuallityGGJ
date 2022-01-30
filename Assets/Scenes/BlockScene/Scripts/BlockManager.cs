@@ -13,6 +13,7 @@ public class BlockManager : MonoBehaviour
     [SerializeField] private BlockContainer _blockContainer;
     [SerializeField] private List<GameObject> _blockObjects;
     [SerializeField] private Transform _uiBlockContainerObject;
+    [SerializeField] private Transform _uiTargetObject;
     [SerializeField] private int _maxItemCount = 3;
     [SerializeField] private float cooldownTime = 1f;
 
@@ -49,7 +50,6 @@ public class BlockManager : MonoBehaviour
         var iconObject = new GameObject(block.Icon.name);
         iconObject.transform.parent = this._uiBlockContainerObject;
         iconObject.transform.localScale = Vector3.one;
-        // var iconObject = Instantiate(new GameObject(), this._uiBlockContainerObject);
         iconObject.AddComponent<Image>().sprite = block.Icon;
         
         this._blockContainer.Add(block);
@@ -63,6 +63,7 @@ public class BlockManager : MonoBehaviour
                 this._cooldownTimer.Reset();
             }
         }
+        this._uiTargetObject.transform.position = this._camera.WorldToScreenPoint(this._inputManager.inputPosition);
     }
 
     public void EnableControls() {
