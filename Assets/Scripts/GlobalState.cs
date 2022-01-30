@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GlobalState : MonoBehaviour
 {
@@ -14,4 +15,9 @@ public class GlobalState : MonoBehaviour
     public BlockInputManager blockInputManager;
     public float score;
     public LayerMask groundMask;
+
+    public void ResetScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
 }
