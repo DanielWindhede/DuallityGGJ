@@ -11,6 +11,7 @@ public class MenuItem : MonoBehaviour
     [SerializeField] AudioSource audioSource;
     [SerializeField] Sprite sprite;
     [SerializeField] Sprite sprite1;
+    [SerializeField] AudioClip clickSound;
     public enum MenuActionType {
         Play,
         Quit,
@@ -18,6 +19,21 @@ public class MenuItem : MonoBehaviour
 
     [SerializeField] private MenuActionType type;
 
+    public void PlaySound()
+    {
+        audioSource.PlayOneShot(clickSound, 1);
+    }
+
+    public void ChangeSprite()
+    {
+
+    }
+
+    public void ChangeSpriteBack()
+    {
+
+    }
+
     public void PlaySound()
     {
         audioSource.Play();

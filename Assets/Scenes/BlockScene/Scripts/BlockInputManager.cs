@@ -14,6 +14,10 @@ public class BlockInputManager : MonoBehaviour, BlockInput
     public event FloatFunc onRotationAnalog;
     public event FloatFunc onCycle;
     public event ButtonClick onRotateRelease;
+    public AudioSource blockCycle;
+    public AudioSource blockPlace;
+    public AudioSource blockSelect;
+    public AudioClip blockCycleSound;
 
     private Camera _camera;
     private float _horzontalValue = 0;
