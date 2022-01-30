@@ -11,7 +11,7 @@ public class MenuManager : MonoBehaviour, MenuInput
     public int SelectedIndex {
         get { return this._selectedIndex; }
         set {
-            this.menuItems[this.SelectedIndex].GetComponent<TMPro.TextMeshProUGUI>().color = Color.white;
+            //this.menuItems[this.SelectedIndex].GetComponent<TMPro.TextMeshProUGUI>().color = Color.white;
 
             if (value > this.menuItems.Count - 1)
                 this._selectedIndex = this.menuItems.Count - 1;
@@ -20,7 +20,7 @@ public class MenuManager : MonoBehaviour, MenuInput
             else
                 this._selectedIndex = value;
 
-            this.menuItems[this.SelectedIndex].GetComponent<TMPro.TextMeshProUGUI>().color = Color.yellow;
+            //this.menuItems[this.SelectedIndex].GetComponent<TMPro.TextMeshProUGUI>().color = Color.yellow;
         }
     }
     // Start is called before the first frame update
