@@ -95,6 +95,7 @@ GameObject:
   - component: {fileID: -7726974406807848415}
   - component: {fileID: 624824005188320310}
   - component: {fileID: 7515181781461948358}
+  - component: {fileID: 7353095551690160923}
   m_Layer: 0
   m_Name: BLOCK_corner_bounce
   m_TagString: Untagged
@@ -111,7 +112,7 @@ Transform:
   m_GameObject: {fileID: 7168166646688387957}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -2.9900017, y: 0.35000038, z: 0.089999914}
-  m_LocalScale: {x: 50, y: 50, z: 50}
+  m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2353511397776623012}
@@ -184,3 +185,16 @@ PolygonCollider2D:
       - {x: -0.01, y: -0.01}
       - {x: 0.03, y: -0.01}
       - {x: 0.03, y: 0.01}
+--- !u!114 &7353095551690160923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7168166646688387957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ecea57ae2a36f54499d6795893e0586, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  property: 3

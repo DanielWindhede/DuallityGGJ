@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1407659206508142783}
   - component: {fileID: 897147286527713854}
   - component: {fileID: 7734205839704219055}
+  - component: {fileID: -7808747534402963159}
   m_Layer: 0
   m_Name: BLOCK_triangle_honey
   m_TagString: Untagged
@@ -98,6 +99,19 @@ PolygonCollider2D:
     - - {x: 0.0052874014, y: 0.01198829}
       - {x: 0.022086078, y: -0.009652861}
       - {x: -0.031120025, y: -0.009373171}
+--- !u!114 &-7808747534402963159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4880513925846470870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ecea57ae2a36f54499d6795893e0586, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  property: 2
 --- !u!1 &5594159872334140243
 GameObject:
   m_ObjectHideFlags: 0
