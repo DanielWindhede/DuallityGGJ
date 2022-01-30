@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3578934377619689608}
   - component: {fileID: -2893936172007266323}
   - component: {fileID: 4558955853679895586}
+  - component: {fileID: 3875646228085614567}
   m_Layer: 0
   m_Name: BLOCK_long_ground
   m_TagString: Untagged
@@ -147,3 +148,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   icon: {fileID: 21300000, guid: 96ef05b18836f574da16918246ea853c, type: 3}
   _spawnWeight: 10
+--- !u!114 &3875646228085614567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3732276731637698433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ecea57ae2a36f54499d6795893e0586, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  property: 0
