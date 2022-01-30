@@ -18,6 +18,10 @@ public class PlayerController : MonoBehaviour, PlayerInput
     [Header("Animation")]
     public Animator animator;
 
+    [Header("Audio")]
+    public AudioSource dashAudioSource;
+    public AudioSource bounceAudioSource;
+
     [Header("Ground Check")]
     public float groundCheckWidth;
     public float groundCheckHeight;
@@ -28,8 +32,12 @@ public class PlayerController : MonoBehaviour, PlayerInput
     public float groundRaycastLength;
 
     [Header("Horizontal Movement")]
-    public float horizontalMovementSpeed;
-    [Range(0, .3f)] public float groundedMovementSmoothing = .05f;
+    public float baseHorizontalMovementSpeed;
+    [HideInInspector] public float currentHorizontalMovementSpeed;
+
+    [Range(0, .3f)] public float baseGroundedMovementSmoothing = .05f;
+    [HideInInspector] public float currentGroundedMovementSmoothing;
+
     [Range(0, .3f)] public float aerialMovementSmoothing = .05f;
     public float maxSlopeAngle;
     public float slideSpeed;
@@ -44,6 +52,12 @@ public class PlayerController : MonoBehaviour, PlayerInput
     public float dashSpeedIncrease;
     public float dashMinSpeed;
 
+    [Header("Block Property Variables")]
+    [Range(0, .3f)] public float slipperyGroundedMovementSmoothing = .1f;
+    public float stickyHorizontalMovementSpeed;
+    [Range(0, 1f)] public float bouncyBlockSpeedRetention;
+    public float minimumSpeedToBounce;
+
 
     [HideInInspector] public bool grounded;
     [HideInInspector] public bool canDash = true;
@@ -54,7 +68,8 @@ public class PlayerController : MonoBehaviour, PlayerInput
 
     #region Private variables
     InputHandler<PlayerInput> inputHandler;
-
+    Vector2 postBounceVelocity;
+    bool shouldBounce;
 
     #endregion
 
@@ -102,24 +117,95 @@ public class PlayerController : MonoBehaviour, PlayerInput
 
     void Update()
     {
+        grounded = Physics2D.OverlapBox(groundCheckPosition.position, new Vector2(groundCheckWidth, groundCheckHeight), 0f, groundaLayermask);
+        
         stateMachine.CurrentlyRunningState.Execute();
 
-        grounded = Physics2D.OverlapBox(groundCheckPosition.position, new Vector2(groundCheckWidth, groundCheckHeight), 0f, groundaLayermask);
         animator.SetBool("InAir", !grounded);
+
     }
 
     void FixedUpdate()
     {
+        if (grounded)
+        {
+            Collider2D currentGroundCollider = Physics2D.OverlapBox(groundCheckPosition.position, new Vector2(groundCheckWidth, groundCheckHeight), 0f, groundaLayermask);
+            if (currentGroundCollider != null)
+            {
+                if (currentGroundCollider.gameObject.GetComponent<BlockProperty>() != null)
+                {
+                    switch (currentGroundCollider.GetComponent<BlockProperty>().property)
+                    {
+                        case BlockProperty.Property.Normal:
+                            currentGroundedMovementSmoothing = baseGroundedMovementSmoothing;
+                            currentHorizontalMovementSpeed = baseHorizontalMovementSpeed;
+                            break;
+                        case BlockProperty.Property.Slippery:
+                            currentGroundedMovementSmoothing = slipperyGroundedMovementSmoothing;
+                            currentHorizontalMovementSpeed = baseHorizontalMovementSpeed;
+                            break;
+                        case BlockProperty.Property.Sticky:
+                            currentGroundedMovementSmoothing = baseGroundedMovementSmoothing;
+                            currentHorizontalMovementSpeed = stickyHorizontalMovementSpeed;
+                            break;
+                        case BlockProperty.Property.Bouncy:
+                            currentGroundedMovementSmoothing = baseGroundedMovementSmoothing;
+                            currentHorizontalMovementSpeed = baseHorizontalMovementSpeed;
+                            break;
+                        default:
+                            Debug.LogError("add new block property to this thing");
+                            break;
+                    }
+                }
+                else
+                {
+                    currentGroundedMovementSmoothing = baseGroundedMovementSmoothing;
+                    currentHorizontalMovementSpeed = baseHorizontalMovementSpeed;
+                }
+            }
+            else
+            {
+                currentGroundedMovementSmoothing = baseGroundedMovementSmoothing;
+                currentHorizontalMovementSpeed = baseHorizontalMovementSpeed;
+            }
+        }
+        else
+        {
+            currentGroundedMovementSmoothing = baseGroundedMovementSmoothing;
+            currentHorizontalMovementSpeed = baseHorizontalMovementSpeed;
+        }
+
         stateMachine.FixedUpdate();
+
+        //if (shouldBounce)
+        //{
+        //    rigidbody.velocity = postBounceVelocity;
+        //    shouldBounce = false;
+        //}
 
         transform.rotation = Quaternion.Euler(transform.rotation.x, (facingRight) ? 0f : 180f, transform.rotation.z);
     }
 
     public void AerialStrafing()
     {
-        Vector3 targetVelocity = new Vector3(inputDirection.x * horizontalMovementSpeed, rigidbody.velocity.y, 0f);
+        Vector3 targetVelocity = new Vector3(inputDirection.x * currentHorizontalMovementSpeed, rigidbody.velocity.y, 0f);
         rigidbody.velocity = Vector3.SmoothDamp(rigidbody.velocity, targetVelocity, ref zeroVector, aerialMovementSmoothing);
     }
+
+    //private void OnCollisionEnter2D(Collision2D collision)
+    //{
+    //    if(collision.gameObject.GetComponent<BlockProperty>() != null)
+    //    {
+    //        if(collision.gameObject.GetComponent<BlockProperty>().property == BlockProperty.Property.Bouncy)
+    //        {
+    //            if(collision.relativeVelocity.magnitude > minimumSpeedToBounce)
+    //            {
+    //                shouldBounce = true;
+    //                postBounceVelocity = Vector2.Reflect(rigidbody.velocity, collision.contacts[0].normal) * bouncyBlockSpeedRetention;
+    //            }
+    //        }
+    //    }
+    //}
 
     #region Input Callbacks
     public void onMoveCallback(Vector2 value)
@@ -181,8 +267,10 @@ public class PlayerIdleState : State<PlayerController>
 
     public override void FixedExecute()
     {
+
+
         //slow down
-        owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, Vector3.zero, ref owner.zeroVector, owner.groundedMovementSmoothing);
+        owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, Vector3.zero, ref owner.zeroVector, owner.currentGroundedMovementSmoothing);
 
         RaycastHit2D hit1 = Physics2D.Raycast(owner.transform.position - new Vector3(owner.playerWidth, 0f, 0f), Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
         RaycastHit2D hit2 = Physics2D.Raycast(owner.transform.position, Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
@@ -306,9 +394,9 @@ public class PlayerWalkingState : State<PlayerController>
 
         targetDirection = Quaternion.AngleAxis(angleBetweenVectors, Vector3.forward) * targetDirection;
 
-        Vector3 targetVelocity = targetDirection * Mathf.Abs(owner.inputDirection.x) * owner.horizontalMovementSpeed;
+        Vector3 targetVelocity = targetDirection * Mathf.Abs(owner.inputDirection.x) * owner.currentHorizontalMovementSpeed;
 
-        owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, targetVelocity, ref owner.zeroVector, owner.groundedMovementSmoothing);
+        owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, targetVelocity, ref owner.zeroVector, owner.currentGroundedMovementSmoothing);
     }
 
     public override void Exit()
@@ -330,7 +418,7 @@ public class PlayerJumpingState : State<PlayerController>
     {
         Debug.Log("YIPIEEE");
         jumpTimer = new Timer(owner.maxJumpTime);
-        
+
         RaycastHit2D hit1 = Physics2D.Raycast(owner.transform.position - new Vector3(owner.playerWidth, 0f, 0f), Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
         RaycastHit2D hit2 = Physics2D.Raycast(owner.transform.position, Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
         RaycastHit2D hit3 = Physics2D.Raycast(owner.transform.position + new Vector3(owner.playerWidth, 0f, 0f), Vector3.down, owner.groundRaycastLength, owner.groundaLayermask);
@@ -397,7 +485,42 @@ public class PlayerFallingState : State<PlayerController>
     {
         if (owner.grounded)
         {
-            owner.stateMachine.ChangeState(owner.idleState);
+            Collider2D currentGroundCollider = Physics2D.OverlapBox(owner.groundCheckPosition.position, new Vector2(owner.groundCheckWidth, owner.groundCheckHeight + 0.5f), 0f, owner.groundaLayermask);
+            if (currentGroundCollider != null)
+            {
+                if (currentGroundCollider.gameObject.GetComponent<BlockProperty>() != null)
+                {
+                    if (currentGroundCollider.gameObject.GetComponent<BlockProperty>().property == BlockProperty.Property.Bouncy)
+                    {
+                        if (Mathf.Abs(owner.rigidbody.velocity.y) > owner.minimumSpeedToBounce)
+                        {
+                            owner.bounceAudioSource.Play();
+                            owner.stateMachine.ChangeState(owner.jumpingState);
+                        }
+                        else
+                        {
+                            Debug.Log("no speed");
+                            owner.stateMachine.ChangeState(owner.idleState);
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("not bounce");
+
+                        owner.stateMachine.ChangeState(owner.idleState);
+                    }
+                }
+                else
+                {
+                    Debug.Log("no block");
+                    owner.stateMachine.ChangeState(owner.idleState);
+                }
+            }
+            else
+            {
+                Debug.Log("no excist?!?!");
+                owner.stateMachine.ChangeState(owner.idleState);
+            }
         }
     }
 
@@ -410,6 +533,7 @@ public class PlayerFallingState : State<PlayerController>
 
     public override void Exit()
     {
+
         owner.canDash = true;
     }
 
@@ -434,6 +558,8 @@ public class PlayerDashingState : State<PlayerController>
         dashSpeed = (owner.rigidbody.velocity.magnitude + owner.dashSpeedIncrease > owner.dashMinSpeed) ? (owner.rigidbody.velocity.magnitude + owner.dashSpeedIncrease) : owner.dashMinSpeed;
 
         owner.animator.SetBool("IsDashing", true);
+
+        owner.dashAudioSource.Play();
 
         Debug.Log("Dashing");
     }
@@ -512,7 +638,7 @@ public class PlayerSlidingState : State<PlayerController>
 
         Vector3 targetVelocity = slideDiraction * owner.slideSpeed;//if u want u can add angle fast slider
 
-        owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, targetVelocity, ref owner.zeroVector, owner.groundedMovementSmoothing);
+        owner.rigidbody.velocity = Vector3.SmoothDamp(owner.rigidbody.velocity, targetVelocity, ref owner.zeroVector, owner.currentGroundedMovementSmoothing);
     }
 
     public override void Exit()
