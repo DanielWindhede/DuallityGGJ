@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class BlockInputManager : MonoBehaviour, BlockInput
 {
-    [SerializeField] private Camera _camera;
     [SerializeField, Min(0)] private float _controlWidth = 10f;
 
     public delegate void ButtonClick();
@@ -16,6 +15,7 @@ public class BlockInputManager : MonoBehaviour, BlockInput
     public event FloatFunc onCycle;
     public event ButtonClick onRotateRelease;
 
+    private Camera _camera;
     private float _horzontalValue = 0;
     private float _verticalValue = 0;
     private InputHandler<BlockInput> _inputHandler;
@@ -36,6 +36,7 @@ public class BlockInputManager : MonoBehaviour, BlockInput
 
     private void Awake()
     {
+        this._camera = Camera.main;
         this._inputHandler = new InputHandler<BlockInput>();
         this._inputHandler.Subscribe(this);
     }
