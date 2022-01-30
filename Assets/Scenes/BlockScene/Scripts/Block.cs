@@ -85,6 +85,8 @@ public class Block : MonoBehaviour
             this.inputManager.onAcceptClick -= this.AcceptClick;
             this.BlockManager.EnableControls();
             this.BlockManager.PlayPlacementSound();
+            this.gameObject.layer = LayerMask.NameToLayer("Ground");
+            print(this.gameObject.layer);
         }
     }
 

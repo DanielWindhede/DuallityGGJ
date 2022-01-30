@@ -13,4 +13,5 @@ public class GlobalState : MonoBehaviour
 
     public BlockInputManager blockInputManager;
     public float score;
+    public LayerMask groundMask;
 }
