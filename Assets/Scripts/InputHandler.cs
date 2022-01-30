@@ -1,4 +1,9 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Users;
+using UnityEngine.InputSystem.Utilities;
 
 public interface BlockInput
 {
@@ -32,38 +37,69 @@ public class InputHandler<T>
   {
     this.inputActions = new InputActions();
     this.inputActions.Enable();
+
+    bool hasAssigedPlayer1 = false;
+    bool hasAssigedPlayer2 = false;
+    var p1Controls = new InputActions();
+    var p2Controls = new InputActions();
+    InputUser p1User;
+    InputUser p2User;
+
+    // Really poor implementation but we are super low on time:DDD
+    foreach (var device in InputSystem.devices) {
+      if (device.GetType() == typeof(UnityEngine.InputSystem.XInput.XInputControllerWindows)) {
+        Debug.Log(device);
+        if (!hasAssigedPlayer1) {
+          // P1 gets gamepad.
+          p1User = InputUser.PerformPairingWithDevice(device);
+          p1User.AssociateActionsWithUser(p1Controls);
+          p1User.ActivateControlScheme("Block");
+          p1Controls.Enable();
+          hasAssigedPlayer1 = true;
+        }
+        else if (!hasAssigedPlayer2) {
+          // P2 gets gamepad.
+          p2User = InputUser.PerformPairingWithDevice(device);
+          p2User.AssociateActionsWithUser(p2Controls);
+          p2User.ActivateControlScheme("Player");
+          p2Controls.Enable();
+          hasAssigedPlayer2 = true;
+        }
+      }
+    }
+  
     switch(input)
         {
             case BlockInput i:
-                this.inputActions.Block.Direction.Enable();
-                this.inputActions.Block.Direction.performed += context => i.onDirectionCallback(context.ReadValue<Vector2>());
+                p1Controls.Block.Direction.Enable();
+                p1Controls.Block.Direction.performed += context => i.onDirectionCallback(context.ReadValue<Vector2>());
 
-                this.inputActions.Block.Accept.Enable();
-                this.inputActions.Block.Accept.performed += _ => i.onAcceptCallback();
+                p1Controls.Block.Accept.Enable();
+                p1Controls.Block.Accept.performed += _ => i.onAcceptCallback();
 
-                this.inputActions.Block.Cycle.Enable();
-                this.inputActions.Block.Cycle.performed += context => i.onCycleCallback(context.ReadValue<float>());
+                p1Controls.Block.Cycle.Enable();
+                p1Controls.Block.Cycle.performed += context => i.onCycleCallback(context.ReadValue<float>());
 
-                this.inputActions.Block.RotateAnalog.Enable();
-                this.inputActions.Block.RotateAnalog.performed += context => i.onRotateAnalogCallback(context.ReadValue<float>());
-                this.inputActions.Block.RotateAnalog.canceled += _ => i.onRotateAnalogReleaseCallback();
+                p1Controls.Block.RotateAnalog.Enable();
+                p1Controls.Block.RotateAnalog.performed += context => i.onRotateAnalogCallback(context.ReadValue<float>());
+                p1Controls.Block.RotateAnalog.canceled += _ => i.onRotateAnalogReleaseCallback();
 
-                this.inputActions.Block.RotateDigitalLeft.Enable();
-                this.inputActions.Block.RotateDigitalLeft.performed += _ => i.onRotateDigitalLeftCallback();
-                this.inputActions.Block.RotateDigitalRight.Enable();
-                this.inputActions.Block.RotateDigitalRight.performed += _ => i.onRotateDigitalRightCallback();
+                p1Controls.Block.RotateDigitalLeft.Enable();
+                p1Controls.Block.RotateDigitalLeft.performed += _ => i.onRotateDigitalLeftCallback();
+                p1Controls.Block.RotateDigitalRight.Enable();
+                p1Controls.Block.RotateDigitalRight.performed += _ => i.onRotateDigitalRightCallback();
                 break;
             case PlayerInput i:
-                this.inputActions.Player.Move.Enable();
-                this.inputActions.Player.Move.performed += context => i.onMoveCallback(context.ReadValue<Vector2>());
-                this.inputActions.Player.Move.canceled += context => i.onMoveCallback(context.ReadValue<Vector2>());
+                p2Controls.Player.Move.Enable();
+                p2Controls.Player.Move.performed += context => i.onMoveCallback(context.ReadValue<Vector2>());
+                p2Controls.Player.Move.canceled += context => i.onMoveCallback(context.ReadValue<Vector2>());
 
-                this.inputActions.Player.Jump.Enable();
-                this.inputActions.Player.Jump.performed += context => i.onJumpCallback(true);
-                this.inputActions.Player.Jump.canceled += context => i.onJumpCallback(false);
+                p2Controls.Player.Jump.Enable();
+                p2Controls.Player.Jump.performed += context => i.onJumpCallback(true);
+                p2Controls.Player.Jump.canceled += context => i.onJumpCallback(false);
 
-                this.inputActions.Player.Dash.Enable();
-                this.inputActions.Player.Dash.performed += context => i.onDashCallback();
+                p2Controls.Player.Dash.Enable();
+                p2Controls.Player.Dash.performed += context => i.onDashCallback();
                 break;
             case MenuInput i:
                 this.inputActions.Menu.Direction.Enable();
