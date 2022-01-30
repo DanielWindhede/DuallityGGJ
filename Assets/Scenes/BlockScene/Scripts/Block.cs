@@ -11,6 +11,7 @@ public class Block : MonoBehaviour
     [SerializeField] private float rotationSpeed = 45f;
     [SerializeField] private float offsetSpeed = 0.5f;
     [SerializeField] private float toggleRotationAmount = 45f;
+    [SerializeField] private float _spawnWeight = 10;
     private int rotationDirection = 0;
     private float rotationAngle;
     private List<Collider2D> collisions;
@@ -31,7 +32,9 @@ public class Block : MonoBehaviour
         get { return this.icon; }
     }
 
-    public GameObject iconGameObject;
+    public float SpawnWeight {
+        get { return this._spawnWeight; }
+    }
 
     // Start is called before the first frame update
     void Start() {

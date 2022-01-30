@@ -267,7 +267,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b57d40e08e32074aad436eab8bad036, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _camera: {fileID: 0}
   _controlWidth: 10
 --- !u!4 &267793009
 Transform:
@@ -314,11 +313,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _loadPlaceholderResources: 1
-  _camera: {fileID: 0}
+  _camera: {fileID: 1679835113}
   _selectedScaleMultiplier: 1.25
   _blockObjects: []
-  _uiBlockContainerObject: {fileID: 0}
+  _uiBlockContainerObject: {fileID: 1059785093}
   _maxItemCount: 3
+  cooldownTime: 1
 --- !u!4 &354908297
 Transform:
   m_ObjectHideFlags: 0

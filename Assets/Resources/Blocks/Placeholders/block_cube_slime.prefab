@@ -150,4 +150,5 @@ MonoBehaviour:
   rotationSpeed: 45
   offsetSpeed: 3
   toggleRotationAmount: 45
+  _spawnWeight: 10
   iconGameObject: {fileID: 0}

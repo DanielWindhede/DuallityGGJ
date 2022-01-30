@@ -14,6 +14,10 @@ public class BlockContainer {
     private int currentIndex;
     private List<Block> heldBlocks;
 
+    public int CurrentIndex {
+        get { return this.currentIndex; }
+    }
+
     public BlockContainer(int maxItemCount = 3) {
         this.maxItemCount = maxItemCount;
         this.heldBlocks = new List<Block>();
@@ -30,7 +34,7 @@ public class BlockContainer {
             var block = this.heldBlocks[this.GetCycledIndex(direction)];
             if (block) {
                 this.Remove(block);
-                this.CycleLeft();
+                // this.CycleLeft();
                 return block;
             }
         }
@@ -49,6 +53,7 @@ public class BlockContainer {
 
     public void CycleToDirection(ContainerDirection directon) {
         this.currentIndex = GetCycledIndex(directon);
+        Debug.Log(this.currentIndex);
     }
 
     public void CycleRight() {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 using static BlockContainer;
 
 public class BlockManager : MonoBehaviour
@@ -18,6 +19,7 @@ public class BlockManager : MonoBehaviour
     private bool _enabledControls = true;
     private BlockInputManager _inputManager;
     private Timer _cooldownTimer;
+    private WeightedObjectPicker objPicker;
     private bool _useTimer;
 
     private void Start()
@@ -28,17 +30,29 @@ public class BlockManager : MonoBehaviour
         this.LoadResources();
         this._camera = Camera.main;
 
+        var odds = _blockObjects.ToArray()
+            .Select(obj => obj.GetComponent<Block>())
+            .Select(block => block.SpawnWeight).ToArray();
+        this.objPicker = new WeightedObjectPicker(_blockObjects.ToArray(), odds);
+
         this._blockContainer = new BlockContainer(_maxItemCount);
         for (int i = 0; i < _maxItemCount; i++) {
-            var block = this._blockObjects[i].GetComponent<Block>();
-            this._blockContainer.Add(block);
-            GameObject imageGO = new GameObject();
-            imageGO.AddComponent<Image>().sprite = this._blockObjects[i].GetComponent<Block>().Icon;
-
-            var go = Instantiate(imageGO, this._uiBlockContainerObject);
-            block.iconGameObject = go;
+            var block = this.objPicker.GetRandomEntry().GetComponent<Block>();
+            this.AddBlockToContainer(block);
         }
+    
         this.CycleDirection(ContainerDirection.Right);
+        print("Start");
+    }
+
+    private void AddBlockToContainer(Block block) {
+        var iconObject = new GameObject(block.Icon.name);
+        iconObject.transform.parent = this._uiBlockContainerObject;
+        iconObject.transform.localScale = Vector3.one;
+        // var iconObject = Instantiate(new GameObject(), this._uiBlockContainerObject);
+        iconObject.AddComponent<Image>().sprite = block.Icon;
+        
+        this._blockContainer.Add(block);
     }
 
     private void FixedUpdate() {
@@ -78,38 +92,49 @@ public class BlockManager : MonoBehaviour
 
     private void DisableControls() {
         this._inputManager.onAcceptClick -= AcceptClick;
+        this._inputManager.onCycle -= Cycle;
         this._enabledControls = false;
     }
 
     private void AcceptClick() {
         if (this._enabledControls && !this._useTimer) {
+            int iconIndex = this._blockContainer.CurrentIndex;
             var block = this._blockContainer.Pop(ContainerDirection.Current);
             if (block)  {
-                if (block.iconGameObject)
-                    Destroy(block.iconGameObject);
+                var iconObject = this._uiBlockContainerObject.GetChild(iconIndex);
+                if (iconObject) {
+                    Destroy(iconObject.gameObject);
+                }
                 
                 var obj = Instantiate(block, this._inputManager.inputPosition, Quaternion.identity, this.transform);
                 obj.name = "Block " + (transform.childCount - 1);
-                this.CycleDirection(ContainerDirection.Current);
                 this.DisableControls();
                 this._useTimer = true;
+                
+                this.AddBlockToContainer(this.objPicker.GetRandomEntry().GetComponent<Block>());
+                this.CycleDirection(ContainerDirection.Current);
+                print("AcceptCallback");
             }
         }
     }
 
     private void Cycle(float value) {
         this.CycleDirection((ContainerDirection)(int)value);
+                print("Cycle");
     }
 
     private void CycleDirection(ContainerDirection value) {
-        if (this._blockContainer.GetCurrentBlock()) {
-            this._blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one;
-            this._blockContainer.CycleToDirection(value);
+        // if (this._blockContainer.GetCurrentBlock()) {
+        //     this._blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one;
+        //     this._blockContainer.CycleToDirection(value);
 
-            if (this._blockContainer.GetCurrentBlock()) {
-                this._blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one * _selectedScaleMultiplier;
-            }
-        }
+        //     if (this._blockContainer.GetCurrentBlock()) {
+        //         this._blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one * _selectedScaleMultiplier;
+        //     }
+        // }
+        this._uiBlockContainerObject.GetChild(this._blockContainer.CurrentIndex).transform.localScale = Vector3.one;
+        this._blockContainer.CycleToDirection(value);
+        this._uiBlockContainerObject.GetChild(this._blockContainer.CurrentIndex).transform.localScale = Vector3.one * _selectedScaleMultiplier;
     }
 
     private void OnDrawGizmos() {
