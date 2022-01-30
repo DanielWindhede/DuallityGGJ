@@ -11,7 +11,7 @@ public class SideWall : MonoBehaviour
     {
         if (collision.tag == "Player")
         {
-            collision.gameObject.transform.position = new Vector2(otherWall.transform.position.x + xOffset, collision.gameObject.transform.position.y);
+            collision.transform.parent.position = new Vector2(otherWall.transform.position.x + xOffset, collision.transform.parent.position.y);
         }
     }
 }
