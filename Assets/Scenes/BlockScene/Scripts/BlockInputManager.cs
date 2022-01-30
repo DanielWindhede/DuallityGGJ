@@ -54,5 +54,8 @@ public class BlockInputManager : MonoBehaviour, BlockInput
     public void onRotateDigitalLeftCallback() { this.onRotateLeftClick.Invoke(); }
     public void onRotateDigitalRightCallback() { this.onRotateRightClick.Invoke(); }
     public void onRotateAnalogReleaseCallback() { this.onRotateRelease.Invoke(); }
-    public void onCycleCallback(float value) { this.onCycle.Invoke(value); }
+    public void onCycleCallback(float value) {
+        if (this.onCycle != null && this.onCycle.GetInvocationList().Length > 0)
+            this.onCycle.Invoke(value);
+    }
 }

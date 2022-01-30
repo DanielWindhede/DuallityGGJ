@@ -34,7 +34,6 @@ public class BlockContainer {
             var block = this.heldBlocks[this.GetCycledIndex(direction)];
             if (block) {
                 this.Remove(block);
-                // this.CycleLeft();
                 return block;
             }
         }

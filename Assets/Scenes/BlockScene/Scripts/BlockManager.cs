@@ -112,29 +112,19 @@ public class BlockManager : MonoBehaviour
                 this._useTimer = true;
                 
                 this.AddBlockToContainer(this.objPicker.GetRandomEntry().GetComponent<Block>());
-                this.CycleDirection(ContainerDirection.Current);
-                print("AcceptCallback");
+                this.CycleDirection(ContainerDirection.Current, 1);
             }
         }
     }
 
     private void Cycle(float value) {
         this.CycleDirection((ContainerDirection)(int)value);
-                print("Cycle");
     }
 
-    private void CycleDirection(ContainerDirection value) {
-        // if (this._blockContainer.GetCurrentBlock()) {
-        //     this._blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one;
-        //     this._blockContainer.CycleToDirection(value);
-
-        //     if (this._blockContainer.GetCurrentBlock()) {
-        //         this._blockContainer.GetCurrentBlock().iconGameObject.transform.localScale = Vector3.one * _selectedScaleMultiplier;
-        //     }
-        // }
-        this._uiBlockContainerObject.GetChild(this._blockContainer.CurrentIndex).transform.localScale = Vector3.one;
+    private void CycleDirection(ContainerDirection value, int offset = 0) {
+        this._uiBlockContainerObject.GetChild(this._blockContainer.CurrentIndex + offset).transform.localScale = Vector3.one;
         this._blockContainer.CycleToDirection(value);
-        this._uiBlockContainerObject.GetChild(this._blockContainer.CurrentIndex).transform.localScale = Vector3.one * _selectedScaleMultiplier;
+        this._uiBlockContainerObject.GetChild(this._blockContainer.CurrentIndex + offset).transform.localScale = Vector3.one * _selectedScaleMultiplier;
     }
 
     private void OnDrawGizmos() {
