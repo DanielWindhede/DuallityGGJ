@@ -7,8 +7,6 @@ using UnityEngine.UI;
 public class Block : MonoBehaviour
 {
     [SerializeField] private Sprite icon;
-    [SerializeField] private float rotationSpeed = 45f;
-    [SerializeField] private float toggleRotationAmount = 45f;
     [SerializeField] private float _spawnWeight = 10;
     private int rotationDirection = 0;
     private float rotationAngle;
@@ -49,16 +47,16 @@ public class Block : MonoBehaviour
         this.inputManager.onAcceptClick += this.AcceptClick;
         this.inputManager.onRotationAnalog += this.AnalogRotation;
         this.inputManager.onRotateRelease += () => this.rotationDirection = 0;
-        this.inputManager.onRotateLeftClick += () => this.rotationAngle -= toggleRotationAmount;
-        this.inputManager.onRotateRightClick += () => this.rotationAngle += toggleRotationAmount;
+        this.inputManager.onRotateLeftClick += () => this.rotationAngle -= this.BlockManager.blockToggleRotationAmount;
+        this.inputManager.onRotateRightClick += () => this.rotationAngle += this.BlockManager.blockToggleRotationAmount;
     }
 
     void OnDestroy() {
         this.inputManager.onAcceptClick -= this.AcceptClick;
         this.inputManager.onRotationAnalog -= this.AnalogRotation;
         this.inputManager.onRotateRelease -= () => this.rotationDirection = 0;
-        this.inputManager.onRotateLeftClick -= () => this.rotationAngle -= toggleRotationAmount;
-        this.inputManager.onRotateRightClick -= () => this.rotationAngle += toggleRotationAmount;
+        this.inputManager.onRotateLeftClick -= () => this.rotationAngle -= this.BlockManager.blockToggleRotationAmount;
+        this.inputManager.onRotateRightClick -= () => this.rotationAngle += this.BlockManager.blockToggleRotationAmount;
     }
 
     // Update is called once per frame
@@ -66,7 +64,7 @@ public class Block : MonoBehaviour
     {
         if (!this.hasBeenPlaced) {
             if (this.rotationDirection != 0) {
-                this.rotationAngle += this.rotationSpeed * Time.fixedDeltaTime * this.rotationDirection;
+                this.rotationAngle += this.BlockManager.blockRotationSpeed * Time.fixedDeltaTime * this.rotationDirection;
             }
             var pos = this.inputManager.inputPosition;
             offset -= this.BlockManager.blockOffsetSpeed * Time.fixedDeltaTime * (1 + this.BlockManager.blockSpeedUpMultiplier * this.inputManager.VerticalInput);

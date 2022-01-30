@@ -18,6 +18,8 @@ public class BlockManager : MonoBehaviour
     [SerializeField] private float cooldownTime = 1f;
     public float blockOffsetSpeed = 0.5f;
     public float blockSpeedUpMultiplier = 1.5f;
+    public float blockRotationSpeed = 45f;
+    public float blockToggleRotationAmount = 45f;
 
     private bool _enabledControls = true;
     private BlockInputManager _inputManager;
