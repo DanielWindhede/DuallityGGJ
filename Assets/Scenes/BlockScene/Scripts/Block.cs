@@ -91,6 +91,7 @@ public class Block : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D col) {
         if (!this.hasBeenPlaced) {
+            print("on trigger!!");
             this.collisions.Add(col);
         }
         
