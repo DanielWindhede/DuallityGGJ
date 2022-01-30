@@ -18,6 +18,9 @@ public class PlayerController : MonoBehaviour, PlayerInput
     [Header("Animation")]
     public Animator animator;
 
+    [Header("Audio")]
+    public AudioSource dashAudioSource;
+
     [Header("Ground Check")]
     public float groundCheckWidth;
     public float groundCheckHeight;
@@ -551,6 +554,8 @@ public class PlayerDashingState : State<PlayerController>
         dashSpeed = (owner.rigidbody.velocity.magnitude + owner.dashSpeedIncrease > owner.dashMinSpeed) ? (owner.rigidbody.velocity.magnitude + owner.dashSpeedIncrease) : owner.dashMinSpeed;
 
         owner.animator.SetBool("IsDashing", true);
+
+        owner.dashAudioSource.Play();
 
         Debug.Log("Dashing");
     }

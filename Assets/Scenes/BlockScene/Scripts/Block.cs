@@ -84,6 +84,7 @@ public class Block : MonoBehaviour
             this.body.bodyType = RigidbodyType2D.Static;
             this.inputManager.onAcceptClick -= this.AcceptClick;
             this.BlockManager.EnableControls();
+            this.BlockManager.PlayPlacementSound();
         }
     }
 
