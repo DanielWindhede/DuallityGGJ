@@ -75,10 +75,9 @@ public class BlockManager : MonoBehaviour
     }
 
     public void RemoveFromCollection(Block block) {
-        if (this._enabledControls) {
+        if (!this._enabledControls) {
             this.EnableControls();
         }
-        this._blockObjects.Remove(block.gameObject);
     }
 
     private void LoadResources() {
