@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
+[RequireComponent(typeof(Rigidbody2D))]
 public class Block : MonoBehaviour
 {
     [SerializeField] private Sprite icon;
@@ -13,7 +13,7 @@ public class Block : MonoBehaviour
     private int rotationDirection = 0;
     private float rotationAngle;
     private List<Collider2D> collisions;
-    private Collider2D collider;
+    private Collider2D _collider;
     private Rigidbody2D body;
     private float offset = 0;
     private BlockInputManager inputManager;
@@ -37,11 +37,14 @@ public class Block : MonoBehaviour
     // Start is called before the first frame update
     void Start() {
         this.body = GetComponent<Rigidbody2D>();
-        this.collider = GetComponent<Collider2D>();
+        this._collider = GetComponent<Collider2D>();
+        if (!this._collider) {
+            this._collider = GetComponentInChildren<Collider2D>();
+        }
         this.collisions = new List<Collider2D>();
         this._blockManager = transform.parent.GetComponent<BlockManager>();
 
-        this.collider.isTrigger = true;
+        this._collider.isTrigger = true;
         this.inputManager = GlobalState.state.blockInputManager;
         this.inputManager.onAcceptClick += this.AcceptClick;
         this.inputManager.onRotationAnalog += this.AnalogRotation;
@@ -79,7 +82,7 @@ public class Block : MonoBehaviour
     private void AcceptClick() {
         if (this.IsPlaceable) {
             this.hasBeenPlaced = true;
-            this.collider.isTrigger = false;
+            this._collider.isTrigger = false;
             this.body.bodyType = RigidbodyType2D.Static;
             this.inputManager.onAcceptClick -= this.AcceptClick;
             this.BlockManager.EnableControls();

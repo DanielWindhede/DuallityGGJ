@@ -313,7 +313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f7cccc4c9bb99547a511c1a869f0700, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _loadPlaceholderResources: 1
+  _loadPlaceholderResources: 0
   _camera: {fileID: 1679835113}
   _selectedScaleMultiplier: 1.25
   _blockObjects: []
