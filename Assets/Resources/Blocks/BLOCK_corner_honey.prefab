@@ -95,6 +95,7 @@ GameObject:
   - component: {fileID: -1428183898926918064}
   - component: {fileID: 4690137166561163899}
   - component: {fileID: 4039458258000265214}
+  - component: {fileID: -8284750006981762594}
   m_Layer: 0
   m_Name: BLOCK_corner_honey
   m_TagString: Untagged
@@ -184,3 +185,16 @@ PolygonCollider2D:
       - {x: -0.01, y: -0.01}
       - {x: 0.03, y: -0.01}
       - {x: 0.03, y: 0.01}
+--- !u!114 &-8284750006981762594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8880474581442612988}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ecea57ae2a36f54499d6795893e0586, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  property: 2

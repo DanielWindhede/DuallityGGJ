@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 6465059570901086704}
   - component: {fileID: 4192300299631695718}
   - component: {fileID: 3832230400251365068}
+  - component: {fileID: 8766173972547522900}
   m_Layer: 0
   m_Name: BLOCK_long_bounce
   m_TagString: Untagged
@@ -147,3 +148,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   icon: {fileID: 21300000, guid: 96ef05b18836f574da16918246ea853c, type: 3}
   _spawnWeight: 10
+--- !u!114 &8766173972547522900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5195197542723047641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ecea57ae2a36f54499d6795893e0586, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  property: 3
