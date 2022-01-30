@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour, PlayerInput
 
     [Header("Audio")]
     public AudioSource dashAudioSource;
+    public AudioSource bounceAudioSource;
 
     [Header("Ground Check")]
     public float groundCheckWidth;
@@ -116,8 +117,10 @@ public class PlayerController : MonoBehaviour, PlayerInput
 
     void Update()
     {
-        stateMachine.CurrentlyRunningState.Execute();
         grounded = Physics2D.OverlapBox(groundCheckPosition.position, new Vector2(groundCheckWidth, groundCheckHeight), 0f, groundaLayermask);
+        
+        stateMachine.CurrentlyRunningState.Execute();
+
         animator.SetBool("InAir", !grounded);
 
     }
@@ -491,6 +494,7 @@ public class PlayerFallingState : State<PlayerController>
                     {
                         if (Mathf.Abs(owner.rigidbody.velocity.y) > owner.minimumSpeedToBounce)
                         {
+                            owner.bounceAudioSource.Play();
                             owner.stateMachine.ChangeState(owner.jumpingState);
                         }
                         else

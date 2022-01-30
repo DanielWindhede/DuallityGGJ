@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 6620998747694971042}
   - component: {fileID: 6620998747694971043}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Collider
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -90,7 +90,7 @@ GameObject:
   - component: {fileID: 6620998749434033033}
   - component: {fileID: 6620998749434033034}
   - component: {fileID: 6620998749434033044}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -149,16 +149,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 6620998749452620850}
+  dashAudioSource: {fileID: 0}
+  bounceAudioSource: {fileID: 0}
   groundCheckWidth: 1.89
   groundCheckHeight: 0.5
   groundCheckPosition: {fileID: 6620998749240532679}
   groundaLayermask:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 64
   playerWidth: 1
   groundRaycastLength: 1.35
-  horizontalMovementSpeed: 10
-  groundedMovementSmoothing: 0.04
+  baseHorizontalMovementSpeed: 10
+  currentHorizontalMovementSpeed: 0
+  baseGroundedMovementSmoothing: 0.05
+  currentGroundedMovementSmoothing: 0
   aerialMovementSmoothing: 0.2
   maxSlopeAngle: 50
   slideSpeed: 10
@@ -168,6 +172,10 @@ MonoBehaviour:
   dashTime: 0.15
   dashSpeedIncrease: 3
   dashMinSpeed: 15
+  slipperyGroundedMovementSmoothing: 0.3
+  stickyHorizontalMovementSpeed: 5
+  bouncyBlockSpeedRetention: 0.9
+  minimumSpeedToBounce: 0.1
   grounded: 0
   canDash: 1
   zeroVector: {x: 0, y: 0, z: 0}
