@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028305, g: 0.22571313, b: 0.3069213, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -252,8 +252,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 2139142493}
-  sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  sprite1: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  sprite: {fileID: 21300000, guid: 22e437355def5904dbb2b8358eaaaf1c, type: 3}
+  sprite1: {fileID: 21300000, guid: 982afaf2b6f60e1449639bee14b2708b, type: 3}
   clickSound: {fileID: 8300000, guid: e06e3877dbb4348a8ab19cd3df0c69ac, type: 3}
   type: 0
 --- !u!222 &301150401
@@ -1013,8 +1013,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 2139142493}
-  sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  sprite1: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  sprite: {fileID: 21300000, guid: d32e49edab729aa4babbeb5640805ddb, type: 3}
+  sprite1: {fileID: 21300000, guid: dc279405a0f947047b34b1e706443346, type: 3}
   clickSound: {fileID: 0}
   type: 1
 --- !u!222 &1759662718
