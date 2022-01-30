@@ -1778,11 +1778,11 @@ RectTransform:
   m_Father: {fileID: 1881098546}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 237, y: -301}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 36.8, y: -14.399994}
   m_SizeDelta: {x: 200, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 1, y: 0}
 --- !u!222 &1946854304
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1958,7 +1958,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 909c742637861534eb2bd8806ad8494e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundCheckRadius: 0.45
+  animator: {fileID: 0}
+  groundCheckWidth: 0
+  groundCheckHeight: 0
   groundCheckPosition: {fileID: 1655171231}
   groundaLayermask:
     serializedVersion: 2
@@ -1980,6 +1982,7 @@ MonoBehaviour:
   canDash: 1
   zeroVector: {x: 0, y: 0, z: 0}
   rigidbody: {fileID: 0}
+  facingRight: 1
   inputDirection: {x: 0, y: 0}
   inputJump: 0
 --- !u!23 &2117879247
